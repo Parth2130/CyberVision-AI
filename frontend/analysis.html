@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberVision AI – Attack Analysis</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Shared styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* ─── CSS Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #F4F8FF;
+      --card:      #FFFFFF;
+      --primary:   #4776E6;
+      --secondary: #8B5CF6;
+      --highlight: #22C7D9;
+      --success:   #34D399;
+      --warning:   #F59E0B;
+      --danger:    #F87171;
+      --text:      #23345D;
+      --text-muted:#6B7280;
+      --border:    #E5ECF8;
+      --shadow:    0 2px 12px rgba(71,118,230,.10);
+      --radius:    14px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+    /* ─── Nav ──────────────────────────────────────────────────── */
+    .navbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .nav-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 64px;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.15rem; font-weight: 800; color: var(--primary);
+    }
+    .nav-brand .brand-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: .9rem;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 4px; list-style: none;
+    }
+    .nav-links a {
+      padding: 6px 14px; border-radius: 8px; font-size: .875rem; font-weight: 500;
+      color: var(--text-muted); transition: all .2s;
+    }
+    .nav-links a:hover,
+    .nav-links a.active { color: var(--primary); background: #EBF0FE; }
+
+    /* ─── Page Header ─────────────────────────────────────────── */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #fff; padding: 40px 24px;
+    }
+    .page-header-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; align-items: center; gap: 18px;
+    }
+    .page-header-icon {
+      width: 60px; height: 60px; border-radius: 16px;
+      background: rgba(255,255,255,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; flex-shrink: 0;
+    }
+    .page-header h1 { font-size: 1.9rem; font-weight: 800; }
+    .page-header p  { font-size: .95rem; opacity: .85; margin-top: 4px; }
+
+    /* ─── Main Container ──────────────────────────────────────── */
+    .container {
+      max-width: 1400px; margin: 0 auto;
+      padding: 28px 24px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* ─── Cards ───────────────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 1rem; font-weight: 700; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title i { color: var(--primary); }
+    .card-body { padding: 20px 22px; }
+
+    /* ─── No-data State ───────────────────────────────────────── */
+    #no-data-state {
+      display: none;
+      text-align: center; padding: 80px 24px;
+    }
+    #no-data-state i { font-size: 3rem; color: var(--text-muted); margin-bottom: 16px; }
+    #no-data-state h2 { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    #no-data-state p  { color: var(--text-muted); margin: 8px 0 20px; }
+    #no-data-state a  {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--primary); color: #fff;
+      padding: 10px 22px; border-radius: 8px; font-weight: 600;
+      transition: opacity .2s;
+    }
+    #no-data-state a:hover { opacity: .85; }
+
+    /* ─── Category Selector Bar ───────────────────────────────── */
+    .cat-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .cat-bar-label { font-size: .9rem; font-weight: 600; color: var(--text-muted); }
+    .cat-btn {
+      padding: 7px 16px; border-radius: 8px; font-size: .825rem; font-weight: 600;
+      border: 1.5px solid var(--border); color: var(--text-muted);
+      transition: all .18s; background: var(--bg);
+    }
+    .cat-btn:hover   { border-color: var(--primary); color: var(--primary); }
+    .cat-btn.active  { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 10px rgba(71,118,230,.35); }
+    .cat-btn .cbadge {
+      display: inline-block; margin-left: 6px;
+      padding: 1px 7px; border-radius: 100px;
+      font-size: .72rem; font-weight: 700;
+      background: rgba(255,255,255,.25); color: inherit;
+    }
+
+    /* ─── Overview Cards ──────────────────────────────────────── */
+    .overview-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .ov-card {
+      background: var(--card); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 20px 22px;
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .ov-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .ov-icon.p  { background: #EBF0FE; color: var(--primary); }
+    .ov-icon.s  { background: #EDE9FE; color: var(--secondary); }
+    .ov-icon.h  { background: #ECFCFF; color: var(--highlight); }
+    .ov-icon.w  { background: #FEF3C7; color: var(--warning); }
+    .ov-label   { font-size: .78rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+    .ov-value   { font-size: 1.55rem; font-weight: 800; color: var(--text); line-height: 1.2; margin-top: 4px; }
+    .ov-sub     { font-size: .8rem; color: var(--text-muted); margin-top: 3px; }
+
+    /* ─── Charts Grid ─────────────────────────────────────────── */
+    .chart-row-2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    .chart-wrap { position: relative; height: 280px; }
+    .chart-wrap-tall { position: relative; height: 320px; }
+
+    /* ─── Heatmap ─────────────────────────────────────────────── */
+    .heatmap-container { overflow-x: auto; }
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: 60px repeat(24, 1fr);
+      gap: 3px;
+      min-width: 760px;
+    }
+    .hm-cell {
+      height: 32px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; font-weight: 600;
+      transition: transform .15s;
+    }
+    .hm-cell:hover { transform: scale(1.15); }
+    .hm-label {
+      display: flex; align-items: center;
+      font-size: .72rem; font-weight: 600; color: var(--text-muted);
+    }
+    .hm-header { font-size: .65rem; font-weight: 600; color: var(--text-muted); height: 22px; display: flex; align-items: flex-end; justify-content: center; }
+    .hm-legend {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 12px; font-size: .75rem; color: var(--text-muted);
+    }
+    .hm-legend-grad {
+      width: 160px; height: 10px; border-radius: 6px;
+      background: linear-gradient(to right, #EBF0FE, var(--danger));
+    }
+
+    /* ─── Table ───────────────────────────────────────────────── */
+    .table-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 7px 12px; flex: 1; max-width: 320px;
+    }
+    .search-box i { color: var(--text-muted); }
+    .search-box input {
+      border: none; background: transparent; outline: none;
+      font-family: inherit; font-size: .875rem; color: var(--text); width: 100%;
+    }
+    .export-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--success); color: #fff;
+      padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: .875rem;
+      transition: opacity .2s;
+    }
+    .export-btn:hover { opacity: .85; }
+
+    .data-table { width: 100%; border-collapse: collapse; font-size: .85rem; margin-top: 16px; }
+    .data-table th {
+      background: var(--bg); color: var(--text-muted);
+      font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+      padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    .data-table th:hover { color: var(--primary); }
+    .data-table th .sort-icon { margin-left: 4px; opacity: .4; }
+    .data-table th.sorted .sort-icon { opacity: 1; color: var(--primary); }
+    .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:hover { background: #F8FAFF; }
+    .data-table .mono { font-family: 'Courier New', monospace; font-size: .8rem; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 100px; font-size: .72rem; font-weight: 700;
+    }
+    .badge-danger   { background: #FEE2E2; color: #DC2626; }
+    .badge-warning  { background: #FEF3C7; color: #D97706; }
+    .badge-success  { background: #D1FAE5; color: #059669; }
+    .badge-primary  { background: #EBF0FE; color: var(--primary); }
+    .badge-secondary{ background: #EDE9FE; color: var(--secondary); }
+    .badge-highlight{ background: #ECFCFF; color: #0891B2; }
+    .badge-dark     { background: #E5E7EB; color: #374151; }
+
+    /* ─── Pagination ──────────────────────────────────────────── */
+    .pagination {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 6px; margin-top: 14px; flex-wrap: wrap;
+    }
+    .pagination span { font-size: .82rem; color: var(--text-muted); margin-right: 6px; }
+    .pg-btn {
+      width: 32px; height: 32px; border-radius: 7px;
+      border: 1.5px solid var(--border); font-size: .8rem; font-weight: 600;
+      color: var(--text-muted); background: var(--bg); transition: all .15s;
+    }
+    .pg-btn:hover    { border-color: var(--primary); color: var(--primary); }
+    .pg-btn.active   { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .pg-btn.disabled { opacity: .35; pointer-events: none; }
+
+    /* ─── Comparison Panel ────────────────────────────────────── */
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+    .compare-selects {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .compare-selects label { font-size: .85rem; font-weight: 600; color: var(--text-muted); }
+    .compare-selects select {
+      padding: 7px 12px; border-radius: 8px; border: 1.5px solid var(--border);
+      font-family: inherit; font-size: .875rem; color: var(--text);
+      background: var(--bg); outline: none; cursor: pointer;
+    }
+    .compare-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .compare-stat-card {
+      background: var(--bg); border-radius: 10px;
+      border: 1px solid var(--border); padding: 14px 16px;
+    }
+    .cs-label  { font-size: .72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
+    .cs-pair   { display: flex; justify-content: space-between; margin-top: 8px; gap: 6px; }
+    .cs-value  { font-size: .9rem; font-weight: 700; }
+    .cs-a      { color: var(--primary); }
+    .cs-b      { color: var(--secondary); }
+    .compare-radar-wrap { position: relative; height: 240px; }
+
+    /* ─── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .overview-grid   { grid-template-columns: repeat(2, 1fr); }
+      .chart-row-2     { grid-template-columns: 1fr; }
+      .compare-grid    { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .overview-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+
+    /* ─── Utilities ───────────────────────────────────────────── */
+    .text-muted { color: var(--text-muted); }
+    .fw-700     { font-weight: 700; }
+    .mt-4       { margin-top: 16px; }
+    .flex-center { display: flex; align-items: center; }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════ NAV ════════════ -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <div class="brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        CyberVision AI
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="upload.html">Upload</a></li>
+        <li><a href="analysis.html" class="active">Analysis</a></li>
+        <li><a href="anomaly.html">Anomaly</a></li>
+        <li><a href="reports.html">Reports</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ════════════ PAGE HEADER ════════════ -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-header-icon">
+        <i class="fa-solid fa-crosshairs"></i>
+      </div>
+      <div>
+        <h1>Attack Analysis</h1>
+        <p>Detailed exploration of attack patterns and categories</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ NO-DATA STATE ════════════ -->
+  <div class="container" id="no-data-state">
+    <div class="card card-body" style="padding:80px 24px;text-align:center">
+      <i class="fa-solid fa-database" style="font-size:3rem;color:var(--text-muted);margin-bottom:18px;display:block"></i>
+      <h2 style="font-size:1.4rem;font-weight:700">No Analysis Data Found</h2>
+      <p style="color:var(--text-muted);margin:10px 0 22px">Please upload and analyse a dataset first to see results here.</p>
+      <a href="upload.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:10px 22px;border-radius:8px;font-weight:600">
+        <i class="fa-solid fa-upload"></i> Upload Dataset
+      </a>
+    </div>
+  </div>
+
+  <!-- ════════════ MAIN CONTENT ════════════ -->
+  <div class="container" id="main-content">
+
+    <!-- Category Selector Bar -->
+    <div class="card">
+      <div class="card-body" style="padding:16px 22px">
+        <div class="cat-bar">
+          <span class="cat-bar-label">View:</span>
+          <button class="cat-btn active" data-cat="all" onclick="setCategory('all',this)">
+            All Categories
+          </button>
+          <button class="cat-btn" data-cat="DoS" onclick="setCategory('DoS',this)" style="border-color:#FCA5A5">
+            DoS<span class="cbadge" id="badge-DoS" style="background:#FCA5A5;color:#7F1D1D">0</span>
+          </button>
+          <button class="cat-btn" data-cat="DDoS" onclick="setCategory('DDoS',this)" style="border-color:#FCD34D">
+            DDoS<span class="cbadge" id="badge-DDoS" style="background:#FCD34D;color:#78350F">0</span>
+          </button>
+          <button class="cat-btn" data-cat="PortScan" onclick="setCategory('PortScan',this)" style="border-color:#C4B5FD">
+            PortScan<span class="cbadge" id="badge-PortScan" style="background:#C4B5FD;color:#4C1D95">0</span>
+          </button>
+          <button class="cat-btn" data-cat="Brute Force" onclick="setCategory('Brute Force',this)" style="border-color:#FCA5A5">
+            Brute Force<span class="cbadge" id="badge-Brute Force" style="background:#FDBA74;color:#7C2D12">0</span>
+          </button>
+          <button class="cat-btn" data-cat="Botnet" onclick="setCategory('Botnet',this)" style="border-color:#9CA3AF">
+            Botnet<span class="cbadge" id="badge-Botnet" style="background:#6B7280;color:#fff">0</span>
+          </button>
+          <button class="cat-btn" data-cat="BENIGN" onclick="setCategory('BENIGN',this)" style="border-color:#6EE7B7">
+            Normal<span class="cbadge" id="badge-BENIGN" style="background:#34D399;color:#064E3B">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="overview-grid">
+      <div class="ov-card">
+        <div class="ov-icon p"><i class="fa-solid fa-skull-crossbones"></i></div>
+        <div>
+          <div class="ov-label">Most Common Attack</div>
+          <div class="ov-value" id="ov-top-attack">—</div>
+          <div class="ov-sub" id="ov-top-attack-count"></div>
+        </div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon s"><i class="fa-solid fa-clock"></i></div>
+        <div>
+          <div class="ov-label">Peak Attack Hour</div>
+          <div class="ov-value" id="ov-peak-hour">—</div>
+          <div class="ov-sub">Highest attack concentration</div>
+        </div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon h"><i class="fa-solid fa-network-wired"></i></div>
+        <div>
+          <div class="ov-label">Unique Source IPs</div>
+          <div class="ov-value" id="ov-unique-ips">—</div>
+          <div class="ov-sub">Distinct attacker addresses</div>
+        </div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon w"><i class="fa-solid fa-stopwatch"></i></div>
+        <div>
+          <div class="ov-label">Avg Flow Duration</div>
+          <div class="ov-value" id="ov-avg-duration">—</div>
+          <div class="ov-sub">Milliseconds</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 1: Category Distribution + Timeline -->
+    <div class="chart-row-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-chart-bar"></i> Attack Category Distribution</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="attackCategoryChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-chart-line"></i> Attack Frequency Over Time</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="attackTimelineChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Severity + Protocol -->
+    <div class="chart-row-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-layer-group"></i> Severity Distribution by Category</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="severityByCategoryChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-circle-nodes"></i> Protocol Distribution</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="protocolChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Source IP Frequency (full width) -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fa-solid fa-map-pin"></i> Source IP Frequency (Top 10)</div>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap-tall"><canvas id="sourceIPChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Row 4: Attack vs Normal + Heatmap -->
+    <div class="chart-row-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-chart-area"></i> Attack vs Normal Over Time</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="attackVsNormalChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fa-solid fa-table-cells"></i> Attack Heatmap (Hour × Day)</div>
+        </div>
+        <div class="card-body">
+          <div class="heatmap-container">
+            <div class="heatmap-grid" id="heatmap-grid"></div>
+          </div>
+          <div class="hm-legend">
+            <span>Low</span>
+            <div class="hm-legend-grad"></div>
+            <span>High</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attack Records Table -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fa-solid fa-table"></i> Attack Records</div>
+        <button class="export-btn" onclick="exportFilteredCSV()">
+          <i class="fa-solid fa-file-csv"></i> Export Filtered
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" id="table-search" placeholder="Search by IP, category, protocol…" oninput="searchTable()" />
+          </div>
+          <div style="font-size:.82rem;color:var(--text-muted)" id="table-count"></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table" id="data-table">
+            <thead>
+              <tr>
+                <th onclick="sortTable(0)">Timestamp <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortTable(1)">Category <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortTable(2)">Protocol <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortTable(3)">Src IP <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortTable(4)">Dst IP <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortTable(5)">Severity <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th onclick="sortTable(6)">Duration (ms) <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- Comparison Panel -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fa-solid fa-code-compare"></i> Category Comparison</div>
+      </div>
+      <div class="card-body">
+        <div class="compare-selects">
+          <label>Compare:</label>
+          <select id="compare-a" onchange="updateComparison()"></select>
+          <span class="text-muted fw-700">vs</span>
+          <select id="compare-b" onchange="updateComparison()"></select>
+        </div>
+        <div class="compare-grid">
+          <div>
+            <div class="compare-stats" id="compare-stats"></div>
+          </div>
+          <div>
+            <div class="compare-radar-wrap"><canvas id="radarChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container -->
+
+  <!-- ════════════ INLINE JAVASCRIPT ════════════ -->
+  <script>
+  (() => {
+    'use strict';
+
+    // ──────────────────────────────────────────────
+    //  COLOUR HELPERS
+    // ──────────────────────────────────────────────
+    const CAT_COLORS = {
+      'DoS':         '#F87171',
+      'DDoS':        '#F59E0B',
+      'PortScan':    '#8B5CF6',
+      'Brute Force': '#FB923C',
+      'Botnet':      '#6B7280',
+      'BENIGN':      '#34D399',
+      'Web Attack':  '#22C7D9',
+      'Infiltration':'#EC4899',
+      'Heartbleed':  '#EF4444',
+      'Other':       '#94A3B8'
+    };
+    function catColor(c) { return CAT_COLORS[c] || '#94A3B8'; }
+    function catColorA(c, a=.15) {
+      const hex = catColor(c).replace('#','');
+      const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16);
+      return `rgba(${r},${g},${b},${a})`;
+    }
+
+    const SEVERITY_COLORS = { High:'#F87171', Medium:'#F59E0B', Low:'#34D399' };
+
+    // ──────────────────────────────────────────────
+    //  LOAD DATA
+    // ──────────────────────────────────────────────
+    let analysisData = null;
+    try {
+      const raw = localStorage.getItem('cybervision_analysis');
+      if (raw) analysisData = JSON.parse(raw);
+    } catch(e) { console.warn('Could not parse localStorage data', e); }
+
+    // If no real data, generate demo data so the page is never blank
+    if (!analysisData) {
+      analysisData = generateDemoData();
+    }
+
+    function generateDemoData() {
+      const categories  = ['DoS','DDoS','PortScan','Brute Force','Botnet','BENIGN'];
+      const protocols   = ['TCP','UDP','ICMP'];
+      const days        = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const records     = [];
+      const now         = Date.now();
+
+      for (let i = 0; i < 480; i++) {
+        const cat  = categories[Math.floor(Math.random()*categories.length)];
+        const ts   = now - Math.random()*7*24*3600*1000;
+        const d    = new Date(ts);
+        records.push({
+          timestamp  : d.toISOString(),
+          category   : cat,
+          protocol   : protocols[Math.floor(Math.random()*protocols.length)],
+          src_ip     : `${rnd(10,200)}.${rnd(0,255)}.${rnd(0,255)}.${rnd(1,254)}`,
+          dst_ip     : `192.168.${rnd(0,5)}.${rnd(1,50)}`,
+          duration   : Math.round(Math.random()*120000),
+          severity   : cat === 'BENIGN' ? 'Low' : (Math.random()>.6?'High':(Math.random()>.4?'Medium':'Low')),
+          hour       : d.getHours(),
+          day        : days[d.getDay()],
+        });
+      }
+      return { records, generated: true };
+    }
+
+    function rnd(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+    // ──────────────────────────────────────────────
+    //  STATE
+    // ──────────────────────────────────────────────
+    let activeCategory = 'all';
+    let allRecords     = analysisData.records || [];
+    let filteredRecords= [...allRecords];
+    let tableRecords   = [...allRecords];
+
+    // Pagination state
+    const PAGE_SIZE = 15;
+    let currentPage = 1;
+    let sortCol     = -1;
+    let sortDir     = 1;
+
+    // Chart references
+    let chartCat, chartTimeline, chartSeverity, chartProtocol, chartSourceIP, chartVsNormal, chartRadar;
+
+    // ──────────────────────────────────────────────
+    //  SHOW PAGE
+    // ──────────────────────────────────────────────
+    document.getElementById('no-data-state').style.display  = 'none';
+    document.getElementById('main-content').style.display   = 'flex';
+
+    // ──────────────────────────────────────────────
+    //  UTILITIES
+    // ──────────────────────────────────────────────
+    function countBy(arr, key) {
+      const map = {};
+      arr.forEach(r => { const v = r[key]||'Unknown'; map[v] = (map[v]||0)+1; });
+      return map;
+    }
+    function avgBy(arr, key) {
+      if (!arr.length) return 0;
+      return arr.reduce((s,r)=> s+(r[key]||0), 0) / arr.length;
+    }
+    function topN(obj, n=10) {
+      return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);
+    }
+
+    function filterRecords(cat) {
+      return cat === 'all' ? [...allRecords] : allRecords.filter(r => r.category === cat);
+    }
+
+    // ──────────────────────────────────────────────
+    //  BADGE COUNTS
+    // ──────────────────────────────────────────────
+    function updateBadges() {
+      const cats = ['DoS','DDoS','PortScan','Brute Force','Botnet','BENIGN'];
+      cats.forEach(c => {
+        const el = document.getElementById('badge-'+c);
+        if (el) el.textContent = allRecords.filter(r=>r.category===c).length;
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  OVERVIEW STATS
+    // ──────────────────────────────────────────────
+    function updateOverview(records) {
+      // Most common attack (exclude BENIGN)
+      const atk = records.filter(r=>r.category!=='BENIGN');
+      const catCount = countBy(atk, 'category');
+      const topCat   = topN(catCount,1)[0];
+      document.getElementById('ov-top-attack').textContent       = topCat ? topCat[0] : '—';
+      document.getElementById('ov-top-attack-count').textContent = topCat ? `${topCat[1].toLocaleString()} events` : '';
+
+      // Peak hour
+      const hourCounts = {};
+      records.forEach(r => { hourCounts[r.hour] = (hourCounts[r.hour]||0)+1; });
+      const peak = Object.entries(hourCounts).sort((a,b)=>b[1]-a[1])[0];
+      document.getElementById('ov-peak-hour').textContent = peak ? `${String(peak[0]).padStart(2,'0')}:00 – ${String(+peak[0]+1).padStart(2,'0')}:00` : '—';
+
+      // Unique IPs
+      const ips = new Set(records.map(r=>r.src_ip));
+      document.getElementById('ov-unique-ips').textContent = ips.size.toLocaleString();
+
+      // Avg duration
+      const avg = avgBy(records, 'duration');
+      document.getElementById('ov-avg-duration').textContent = avg ? avg.toFixed(0)+' ms' : '—';
+    }
+
+    // ──────────────────────────────────────────────
+    //  CHART.JS HELPERS
+    // ──────────────────────────────────────────────
+    const chartDefaults = {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeInOutQuart' },
+      plugins: { legend: { labels: { font: { family: 'Inter', size: 12 }, color: '#23345D' } } }
+    };
+
+    // ──────────────────────────────────────────────
+    //  1. Category Distribution (vertical bar)
+    // ──────────────────────────────────────────────
+    function buildCategoryChart(records) {
+      const counts = countBy(records, 'category');
+      const sorted = topN(counts, 12);
+      const labels = sorted.map(([k])=>k);
+      const data   = sorted.map(([,v])=>v);
+      const colors = labels.map(l=>catColor(l));
+
+      if (chartCat) {
+        chartCat.data.labels       = labels;
+        chartCat.data.datasets[0].data         = data;
+        chartCat.data.datasets[0].backgroundColor = colors.map(c=>c+'CC');
+        chartCat.data.datasets[0].borderColor   = colors;
+        chartCat.update();
+        return;
+      }
+      chartCat = new Chart(document.getElementById('attackCategoryChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Occurrences',
+            data,
+            backgroundColor: colors.map(c=>c+'CC'),
+            borderColor: colors,
+            borderWidth: 2,
+            borderRadius: 6,
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          plugins: { ...chartDefaults.plugins, legend: { display: false } },
+          scales: {
+            x: { ticks: { font: { family:'Inter', size:11 }, color:'#6B7280' }, grid: { display:false } },
+            y: { ticks: { font: { family:'Inter', size:11 }, color:'#6B7280' }, grid: { color:'#E5ECF8' } }
+          }
+        }
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  2. Attack Timeline (line, multi-series by category)
+    // ──────────────────────────────────────────────
+    function buildTimelineChart(records) {
+      // Bucket by day
+      const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const cats = [...new Set(records.map(r=>r.category))].sort();
+
+      const datasets = cats.map(cat => {
+        const byDay = {};
+        days.forEach(d => byDay[d]=0);
+        records.filter(r=>r.category===cat).forEach(r=>{ byDay[r.day]=(byDay[r.day]||0)+1; });
+        return {
+          label: cat,
+          data: days.map(d=>byDay[d]),
+          borderColor: catColor(cat),
+          backgroundColor: catColorA(cat, .15),
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: .35,
+          fill: false,
+        };
+      });
+
+      if (chartTimeline) {
+        chartTimeline.data.datasets = datasets;
+        chartTimeline.update();
+        return;
+      }
+      chartTimeline = new Chart(document.getElementById('attackTimelineChart'), {
+        type: 'line',
+        data: { labels: days, datasets },
+        options: {
+          ...chartDefaults,
+          scales: {
+            x: { ticks: { font:{family:'Inter',size:11}, color:'#6B7280' }, grid:{color:'#E5ECF8'} },
+            y: { ticks: { font:{family:'Inter',size:11}, color:'#6B7280' }, grid:{color:'#E5ECF8'} }
+          }
+        }
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  3. Severity by Category (stacked bar)
+    // ──────────────────────────────────────────────
+    function buildSeverityChart(records) {
+      const cats = [...new Set(records.map(r=>r.category))].sort();
+      const severities = ['High','Medium','Low'];
+
+      const datasets = severities.map(sev => {
+        return {
+          label: sev,
+          data: cats.map(cat => records.filter(r=>r.category===cat && r.severity===sev).length),
+          backgroundColor: SEVERITY_COLORS[sev]+'CC',
+          borderColor: SEVERITY_COLORS[sev],
+          borderWidth: 1.5,
+          borderRadius: { topLeft:4, topRight:4 },
+        };
+      });
+
+      if (chartSeverity) {
+        chartSeverity.data.labels   = cats;
+        chartSeverity.data.datasets = datasets;
+        chartSeverity.update();
+        return;
+      }
+      chartSeverity = new Chart(document.getElementById('severityByCategoryChart'), {
+        type: 'bar',
+        data: { labels: cats, datasets },
+        options: {
+          ...chartDefaults,
+          scales: {
+            x: { stacked:true, ticks:{font:{family:'Inter',size:11},color:'#6B7280'}, grid:{display:false} },
+            y: { stacked:true, ticks:{font:{family:'Inter',size:11},color:'#6B7280'}, grid:{color:'#E5ECF8'} }
+          }
+        }
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  4. Protocol (doughnut)
+    // ──────────────────────────────────────────────
+    function buildProtocolChart(records) {
+      const counts = countBy(records, 'protocol');
+      const sorted = topN(counts);
+      const labels = sorted.map(([k])=>k);
+      const data   = sorted.map(([,v])=>v);
+      const colors = ['#4776E6','#8B5CF6','#22C7D9','#34D399','#F59E0B','#F87171'];
+
+      if (chartProtocol) {
+        chartProtocol.data.labels             = labels;
+        chartProtocol.data.datasets[0].data   = data;
+        chartProtocol.data.datasets[0].backgroundColor = colors.slice(0,labels.length);
+        chartProtocol.update();
+        return;
+      }
+      chartProtocol = new Chart(document.getElementById('protocolChart'), {
+        type: 'doughnut',
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: colors.slice(0,labels.length),
+            borderWidth: 3,
+            borderColor: '#fff',
+            hoverOffset: 8,
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          cutout: '62%',
+          plugins: {
+            legend: { position:'right', labels:{font:{family:'Inter',size:12},color:'#23345D', padding:16} }
+          }
+        }
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  5. Source IP Frequency (horizontal bar)
+    // ──────────────────────────────────────────────
+    function buildSourceIPChart(records) {
+      const ipCounts = countBy(records, 'src_ip');
+      const top10    = topN(ipCounts, 10);
+      const labels   = top10.map(([k])=>k).reverse();
+      const data     = top10.map(([,v])=>v).reverse();
+
+      if (chartSourceIP) {
+        chartSourceIP.data.labels             = labels;
+        chartSourceIP.data.datasets[0].data   = data;
+        chartSourceIP.update();
+        return;
+      }
+      chartSourceIP = new Chart(document.getElementById('sourceIPChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Events',
+            data,
+            backgroundColor: '#4776E633',
+            borderColor: '#4776E6',
+            borderWidth: 2,
+            borderRadius: 4,
+          }]
+        },
+        options: {
+          ...chartDefaults,
+          indexAxis: 'y',
+          plugins: { ...chartDefaults.plugins, legend:{ display:false } },
+          scales: {
+            x: { ticks:{font:{family:'Inter',size:11},color:'#6B7280'}, grid:{color:'#E5ECF8'} },
+            y: { ticks:{font:{family:'Inter',size:10.5},color:'#6B7280'}, grid:{display:false} }
+          }
+        }
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  6. Attack vs Normal Over Time (area)
+    // ──────────────────────────────────────────────
+    function buildVsNormalChart(records) {
+      const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const attack = {}, normal = {};
+      days.forEach(d=>{ attack[d]=0; normal[d]=0; });
+      records.forEach(r => {
+        if (r.category==='BENIGN') normal[r.day]=(normal[r.day]||0)+1;
+        else attack[r.day]=(attack[r.day]||0)+1;
+      });
+
+      if (chartVsNormal) {
+        chartVsNormal.data.datasets[0].data = days.map(d=>attack[d]);
+        chartVsNormal.data.datasets[1].data = days.map(d=>normal[d]);
+        chartVsNormal.update();
+        return;
+      }
+      chartVsNormal = new Chart(document.getElementById('attackVsNormalChart'), {
+        type: 'line',
+        data: {
+          labels: days,
+          datasets: [
+            {
+              label: 'Attack Traffic',
+              data: days.map(d=>attack[d]),
+              borderColor: '#F87171',
+              backgroundColor: 'rgba(248,113,113,.12)',
+              borderWidth: 2.5,
+              fill: true,
+              tension: .4,
+              pointRadius: 4,
+            },
+            {
+              label: 'Normal Traffic',
+              data: days.map(d=>normal[d]),
+              borderColor: '#34D399',
+              backgroundColor: 'rgba(52,211,153,.12)',
+              borderWidth: 2.5,
+              fill: true,
+              tension: .4,
+              pointRadius: 4,
+            }
+          ]
+        },
+        options: {
+          ...chartDefaults,
+          scales: {
+            x: { ticks:{font:{family:'Inter',size:11},color:'#6B7280'}, grid:{color:'#E5ECF8'} },
+            y: { ticks:{font:{family:'Inter',size:11},color:'#6B7280'}, grid:{color:'#E5ECF8'} }
+          }
+        }
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  7. Heatmap (CSS grid + JS coloring)
+    // ──────────────────────────────────────────────
+    function buildHeatmap(records) {
+      const days  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const hours = Array.from({length:24},(_,i)=>i);
+      const grid  = document.getElementById('heatmap-grid');
+      grid.innerHTML = '';
+
+      // Build count matrix
+      const matrix = {};
+      days.forEach(d => { matrix[d]={}; hours.forEach(h=>{ matrix[d][h]=0; }); });
+      records.forEach(r => {
+        if (matrix[r.day] !== undefined && hours.includes(r.hour))
+          matrix[r.day][r.hour]++;
+      });
+
+      // Max count for normalisation
+      let maxVal = 1;
+      days.forEach(d => hours.forEach(h => { if (matrix[d][h]>maxVal) maxVal=matrix[d][h]; }));
+
+      // Header row (hour labels)
+      const emptyCorner = document.createElement('div');
+      emptyCorner.className = 'hm-header';
+      grid.appendChild(emptyCorner);
+      hours.forEach(h => {
+        const cell = document.createElement('div');
+        cell.className = 'hm-header';
+        cell.textContent = h%4===0 ? h : '';
+        grid.appendChild(cell);
+      });
+
+      // Data rows
+      days.forEach(day => {
+        const lbl = document.createElement('div');
+        lbl.className = 'hm-label';
+        lbl.textContent = day;
+        grid.appendChild(lbl);
+
+        hours.forEach(h => {
+          const v    = matrix[day][h];
+          const norm = v / maxVal;
+          const cell = document.createElement('div');
+          cell.className = 'hm-cell';
+          const r = Math.round(71  + (248-71 )*norm);   // from #4776E6 to #F87171
+          const g = Math.round(118 + (113-118)*norm);
+          const b = Math.round(230 + (113-230)*norm);
+          cell.style.background = `rgba(${r},${g},${b},${0.08+0.85*norm})`;
+          cell.title = `${day} ${h}:00 – ${v} events`;
+          if (norm > .6) { cell.style.color='#fff'; cell.textContent = v||''; }
+          else if (norm > .25) { cell.style.color=`rgb(${r},${g},${b})`; cell.textContent=v||''; }
+          grid.appendChild(cell);
+        });
+      });
+    }
+
+    // ──────────────────────────────────────────────
+    //  TABLE
+    // ──────────────────────────────────────────────
+    function catBadgeClass(cat) {
+      const map = {
+        'DoS':'badge-danger', 'DDoS':'badge-warning', 'PortScan':'badge-secondary',
+        'Brute Force':'badge-danger', 'Botnet':'badge-dark', 'BENIGN':'badge-success',
+        'Web Attack':'badge-highlight', 'Infiltration':'badge-secondary'
+      };
+      return map[cat]||'badge-primary';
+    }
+    function sevBadgeClass(s) {
+      return s==='High'?'badge-danger': s==='Medium'?'badge-warning':'badge-success';
+    }
+    function fmtTs(ts) {
+      try { return new Date(ts).toLocaleString(); } catch{ return ts||'—'; }
+    }
+
+    function renderTable() {
+      const body  = document.getElementById('table-body');
+      const start = (currentPage-1)*PAGE_SIZE;
+      const slice = tableRecords.slice(start, start+PAGE_SIZE);
+
+      body.innerHTML = slice.map(r => `
+        <tr>
+          <td class="mono">${fmtTs(r.timestamp)}</td>
+          <td><span class="badge ${catBadgeClass(r.category)}">${r.category}</span></td>
+          <td><span class="badge badge-primary">${r.protocol||'—'}</span></td>
+          <td class="mono">${r.src_ip||'—'}</td>
+          <td class="mono">${r.dst_ip||'—'}</td>
+          <td><span class="badge ${sevBadgeClass(r.severity)}">${r.severity||'—'}</span></td>
+          <td>${(r.duration||0).toLocaleString()}</td>
+          <td><span class="badge ${r.category==='BENIGN'?'badge-success':'badge-danger'}">
+            ${r.category==='BENIGN'?'Normal':'Attack'}
+          </span></td>
+        </tr>
+      `).join('');
+
+      document.getElementById('table-count').textContent =
+        `Showing ${start+1}–${Math.min(start+PAGE_SIZE,tableRecords.length)} of ${tableRecords.length.toLocaleString()} records`;
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const pg   = document.getElementById('pagination');
+      const total= Math.ceil(tableRecords.length / PAGE_SIZE);
+      if (total <= 1) { pg.innerHTML=''; return; }
+
+      let html = `<span>${total} pages</span>`;
+      html += `<button class="pg-btn${currentPage===1?' disabled':''}" onclick="goPage(${currentPage-1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+
+      let start = Math.max(1, currentPage-2);
+      let end   = Math.min(total, start+4);
+      start = Math.max(1, end-4);
+      for (let i=start;i<=end;i++) {
+        html += `<button class="pg-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+      }
+
+      html += `<button class="pg-btn${currentPage===total?' disabled':''}" onclick="goPage(${currentPage+1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+      pg.innerHTML = html;
+    }
+
+    window.goPage = function(p) {
+      const total = Math.ceil(tableRecords.length / PAGE_SIZE);
+      if (p<1||p>total) return;
+      currentPage = p; renderTable();
+    };
+
+    window.sortTable = function(col) {
+      const ths = document.querySelectorAll('.data-table th');
+      ths.forEach((th,i) => {
+        th.classList.toggle('sorted', i===col);
+        const ic = th.querySelector('.sort-icon');
+        if (ic) ic.className = 'fa-solid sort-icon ' + (i===col ? (sortDir===1?'fa-sort-up':'fa-sort-down') : 'fa-sort');
+      });
+      if (sortCol === col) sortDir = -sortDir; else { sortCol=col; sortDir=1; }
+      const keys = ['timestamp','category','protocol','src_ip','dst_ip','severity','duration'];
+      const key  = keys[col];
+      tableRecords.sort((a,b)=>{
+        const av=a[key]||'', bv=b[key]||'';
+        return typeof av==='number' ? (av-bv)*sortDir : String(av).localeCompare(String(bv))*sortDir;
+      });
+      currentPage=1; renderTable();
+    };
+
+    window.searchTable = function() {
+      const q = document.getElementById('table-search').value.toLowerCase().trim();
+      tableRecords = filteredRecords.filter(r =>
+        (r.category||'').toLowerCase().includes(q) ||
+        (r.protocol||'').toLowerCase().includes(q) ||
+        (r.src_ip||'').includes(q) ||
+        (r.dst_ip||'').includes(q)
+      );
+      currentPage=1; renderTable();
+    };
+
+    window.exportFilteredCSV = function() {
+      const header = 'Timestamp,Category,Protocol,Src IP,Dst IP,Severity,Duration (ms),Status';
+      const rows = tableRecords.map(r =>
+        [fmtTs(r.timestamp),r.category,r.protocol,r.src_ip,r.dst_ip,r.severity,r.duration,
+         r.category==='BENIGN'?'Normal':'Attack'].join(',')
+      );
+      const csv  = [header,...rows].join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href=url; a.download='cybervision_attack_analysis.csv'; a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    // ──────────────────────────────────────────────
+    //  COMPARISON PANEL
+    // ──────────────────────────────────────────────
+    function populateCompareSelects() {
+      const cats = [...new Set(allRecords.map(r=>r.category))].sort();
+      ['compare-a','compare-b'].forEach((id,i) => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+        sel.selectedIndex = Math.min(i, cats.length-1);
+      });
+    }
+
+    window.updateComparison = function() {
+      const catA = document.getElementById('compare-a').value;
+      const catB = document.getElementById('compare-b').value;
+      const recA = allRecords.filter(r=>r.category===catA);
+      const recB = allRecords.filter(r=>r.category===catB);
+
+      function mostCommonProtocol(recs) {
+        const c=countBy(recs,'protocol'); const t=topN(c,1)[0]; return t?t[0]:'—';
+      }
+      function peakHour(recs) {
+        const c={}; recs.forEach(r=>{ c[r.hour]=(c[r.hour]||0)+1; });
+        const t=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];
+        return t?`${String(t[0]).padStart(2,'0')}:00`:'—';
+      }
+
+      const stats = [
+        { label:'Count', a:recA.length.toLocaleString(), b:recB.length.toLocaleString() },
+        { label:'Avg Duration (ms)', a:avgBy(recA,'duration').toFixed(0), b:avgBy(recB,'duration').toFixed(0) },
+        { label:'Top Protocol', a:mostCommonProtocol(recA), b:mostCommonProtocol(recB) },
+        { label:'Peak Hour', a:peakHour(recA), b:peakHour(recB) },
+      ];
+
+      document.getElementById('compare-stats').innerHTML = stats.map(s=>`
+        <div class="compare-stat-card">
+          <div class="cs-label">${s.label}</div>
+          <div class="cs-pair">
+            <div>
+              <div style="font-size:.68rem;font-weight:600;color:var(--primary)">${catA}</div>
+              <div class="cs-value cs-a">${s.a}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:.68rem;font-weight:600;color:var(--secondary)">${catB}</div>
+              <div class="cs-value cs-b">${s.b}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Radar chart
+      const features = ['Count','Avg Duration','High Severity','Unique IPs','Peak Activity'];
+      function normalize(v,max){ return max?v/max:0; }
+      const maxCount  = Math.max(recA.length,recB.length)||1;
+      const maxDur    = Math.max(avgBy(recA,'duration'),avgBy(recB,'duration'))||1;
+      const aHighSev  = recA.filter(r=>r.severity==='High').length;
+      const bHighSev  = recB.filter(r=>r.severity==='High').length;
+      const maxHigh   = Math.max(aHighSev,bHighSev)||1;
+      const aUIPs     = new Set(recA.map(r=>r.src_ip)).size;
+      const bUIPs     = new Set(recB.map(r=>r.src_ip)).size;
+      const maxUIPs   = Math.max(aUIPs,bUIPs)||1;
+      const getHourMax = (recs) => { const c={}; recs.forEach(r=>{c[r.hour]=(c[r.hour]||0)+1;}); return Math.max(...Object.values(c),0); };
+      const aPeak = getHourMax(recA), bPeak = getHourMax(recB);
+      const maxPeak = Math.max(aPeak,bPeak)||1;
+
+      const dataA = [
+        normalize(recA.length,maxCount),
+        normalize(avgBy(recA,'duration'),maxDur),
+        normalize(aHighSev,maxHigh),
+        normalize(aUIPs,maxUIPs),
+        normalize(aPeak,maxPeak),
+      ];
+      const dataB = [
+        normalize(recB.length,maxCount),
+        normalize(avgBy(recB,'duration'),maxDur),
+        normalize(bHighSev,maxHigh),
+        normalize(bUIPs,maxUIPs),
+        normalize(bPeak,maxPeak),
+      ];
+
+      if (chartRadar) {
+        chartRadar.data.labels = features;
+        chartRadar.data.datasets[0].label = catA;
+        chartRadar.data.datasets[0].data  = dataA;
+        chartRadar.data.datasets[0].borderColor = catColor(catA);
+        chartRadar.data.datasets[0].backgroundColor = catColorA(catA,.2);
+        chartRadar.data.datasets[1].label = catB;
+        chartRadar.data.datasets[1].data  = dataB;
+        chartRadar.data.datasets[1].borderColor = catColor(catB);
+        chartRadar.data.datasets[1].backgroundColor = catColorA(catB,.2);
+        chartRadar.update();
+        return;
+      }
+
+      chartRadar = new Chart(document.getElementById('radarChart'), {
+        type: 'radar',
+        data: {
+          labels: features,
+          datasets: [
+            {
+              label: catA, data: dataA,
+              borderColor: catColor(catA), backgroundColor: catColorA(catA,.2),
+              borderWidth: 2.5, pointRadius: 4,
+            },
+            {
+              label: catB, data: dataB,
+              borderColor: catColor(catB), backgroundColor: catColorA(catB,.2),
+              borderWidth: 2.5, pointRadius: 4,
+            },
+          ]
+        },
+        options: {
+          ...chartDefaults,
+          scales: {
+            r: {
+              ticks: { display:false, stepSize:.25 },
+              grid: { color:'#E5ECF8' },
+              pointLabels: { font:{family:'Inter',size:11}, color:'#23345D' },
+              suggestedMin: 0, suggestedMax: 1,
+            }
+          }
+        }
+      });
+    };
+
+    // ──────────────────────────────────────────────
+    //  CATEGORY FILTER
+    // ──────────────────────────────────────────────
+    window.setCategory = function(cat, btn) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilter();
+    };
+
+    function applyFilter() {
+      filteredRecords = filterRecords(activeCategory);
+      tableRecords    = [...filteredRecords];
+      currentPage = 1;
+      updateOverview(filteredRecords);
+      buildCategoryChart(filteredRecords);
+      buildTimelineChart(filteredRecords);
+      buildSeverityChart(filteredRecords);
+      buildProtocolChart(filteredRecords);
+      buildSourceIPChart(filteredRecords);
+      buildVsNormalChart(filteredRecords);
+      buildHeatmap(filteredRecords);
+      document.getElementById('table-search').value = '';
+      renderTable();
+    }
+
+    // ──────────────────────────────────────────────
+    //  INIT
+    // ──────────────────────────────────────────────
+    function init() {
+      updateBadges();
+      applyFilter();
+      populateCompareSelects();
+      updateComparison();
+    }
+
+    init();
+
+  })();
+  </script>
+</body>
+</html>

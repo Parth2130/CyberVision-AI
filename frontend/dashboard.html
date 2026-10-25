@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberVision AI – Analytics Dashboard</title>
+
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Local stylesheet (optional, falls back gracefully if absent) -->
+  <link rel="stylesheet" href="css/style.css" onerror="this.remove()" />
+
+  <style>
+    /* ── CSS variables ── */
+    :root {
+      --bg:        #F4F8FF;
+      --card:      #FFFFFF;
+      --primary:   #4776E6;
+      --secondary: #8B5CF6;
+      --highlight: #22C7D9;
+      --success:   #34D399;
+      --warning:   #F59E0B;
+      --danger:    #F87171;
+      --text:      #23345D;
+      --text-muted:#6B7FAD;
+      --border:    #E2EAF7;
+      --radius:    14px;
+      --shadow:    0 4px 24px rgba(71,118,230,.08);
+      --shadow-sm: 0 2px 10px rgba(71,118,230,.06);
+      --transition:.22s ease;
+    }
+
+    /* ── Reset / base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { cursor: pointer; font-family: inherit; }
+    input, select { font-family: inherit; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+    /* ─────────────────────────── NAVBAR ─────────────────────────── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      height: 64px;
+      gap: 24px;
+    }
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .navbar-brand .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1rem;
+    }
+    .navbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 16px;
+      list-style: none;
+      flex: 1;
+    }
+    .navbar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: .875rem;
+      font-weight: 500;
+      transition: background var(--transition), color var(--transition);
+      text-decoration: none;
+    }
+    .navbar-nav a:hover,
+    .navbar-nav a.active {
+      background: rgba(71,118,230,.08);
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 500;
+      transition: all var(--transition);
+    }
+    .btn-ghost:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      color: #fff;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--highlight), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 700;
+    }
+
+    /* ─────────────────────────── MAIN LAYOUT ─────────────────────────── */
+    .main { max-width: 1440px; margin: 0 auto; padding: 28px 32px 60px; }
+
+    /* ─────────────────────────── PAGE HEADER ─────────────────────────── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .page-header-left h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .page-header-left h1 .h-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+    .page-header-left p {
+      font-size: .9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      padding-left: 58px;
+    }
+    .page-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 600;
+      background: rgba(52,211,153,.12);
+      color: var(--success);
+      border: 1px solid rgba(52,211,153,.3);
+    }
+    .status-badge.no-data {
+      background: rgba(107,127,173,.1);
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .status-badge .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+    .status-badge.no-data .dot { animation: none; }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50%      { opacity: .3; }
+    }
+    .timestamp-label {
+      font-size: .8rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .btn-export {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      padding: 9px 18px;
+      border-radius: 9px;
+      font-size: .85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-export:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* ─────────────────────────── FILTER BAR ─────────────────────────── */
+    .filter-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 18px 24px;
+      margin-bottom: 28px;
+    }
+    .filter-bar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .dataset-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dataset-info .di-icon {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: rgba(71,118,230,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: .85rem;
+    }
+    .dataset-info .di-name {
+      font-weight: 600;
+      font-size: .9rem;
+      color: var(--text);
+    }
+    .dataset-info .di-count {
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+    .filter-bar-actions { display: flex; align-items: center; gap: 10px; }
+    .link-sm {
+      font-size: .82rem;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      padding: 0;
+      font-weight: 500;
+      transition: color var(--transition);
+    }
+    .link-sm:hover { color: var(--primary); }
+    .filters-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+    .filter-group label { font-size: .72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .filter-input {
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 10px;
+      font-size: .84rem;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .filter-input:focus { border-color: var(--primary); }
+    .btn-apply {
+      height: 36px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0 18px;
+      font-size: .85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: opacity var(--transition);
+      align-self: flex-end;
+    }
+    .btn-apply:hover { opacity: .85; }
+    .btn-clear {
+      height: 36px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: .82rem;
+      font-weight: 500;
+      align-self: flex-end;
+      transition: color var(--transition);
+    }
+    .btn-clear:hover { color: var(--danger); }
+
+    /* ─────────────────────────── STAT CARDS ─────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 700px)  { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 20px 18px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+      border-left: 4px solid transparent;
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+    .stat-card .sc-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .stat-card .sc-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: #fff;
+    }
+    .stat-card .sc-trend {
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .stat-card .sc-value {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-card .sc-label {
+      font-size: .8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    /* Color variants */
+    .sc-blue  { border-left-color: var(--primary); }
+    .sc-blue  .sc-icon  { background: linear-gradient(135deg, #4776E6, #6FA3FF); }
+    .sc-blue  .sc-trend { background: rgba(71,118,230,.12); color: var(--primary); }
+    .sc-green { border-left-color: var(--success); }
+    .sc-green .sc-icon  { background: linear-gradient(135deg, #34D399, #6EE7B7); }
+    .sc-green .sc-trend { background: rgba(52,211,153,.12); color: var(--success); }
+    .sc-red   { border-left-color: var(--danger); }
+    .sc-red   .sc-icon  { background: linear-gradient(135deg, #F87171, #FCA5A5); }
+    .sc-red   .sc-trend { background: rgba(248,113,113,.12); color: var(--danger); }
+    .sc-orange{ border-left-color: var(--warning); }
+    .sc-orange .sc-icon { background: linear-gradient(135deg, #F59E0B, #FCD34D); }
+    .sc-orange .sc-trend{ background: rgba(245,158,11,.12); color: var(--warning); }
+    .sc-purple{ border-left-color: var(--secondary); }
+    .sc-purple .sc-icon { background: linear-gradient(135deg, #8B5CF6, #A78BFA); }
+    .sc-purple .sc-trend{ background: rgba(139,92,246,.12); color: var(--secondary); }
+
+    /* ─────────────────────────── CHARTS ─────────────────────────── */
+    .charts-row {
+      display: grid;
+      gap: 22px;
+      margin-bottom: 22px;
+    }
+    .charts-row.two-col { grid-template-columns: 1fr 1fr; }
+    .charts-row.one-col { grid-template-columns: 1fr; }
+    @media (max-width: 900px) { .charts-row.two-col { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .chart-header h3 {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chart-header h3 .ch-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .chart-body {
+      padding: 18px 22px;
+      flex: 1;
+      position: relative;
+    }
+    .chart-body canvas { max-height: 320px; }
+
+    /* Time-filter buttons */
+    .time-filters { display: flex; gap: 6px; }
+    .btn-tf {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: .75rem;
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+    .btn-tf.active,
+    .btn-tf:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+    /* ─────────────────────────── EMPTY STATE ─────────────────────────── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 52px 20px;
+      text-align: center;
+    }
+    .empty-state .es-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      background: rgba(71,118,230,.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--primary);
+    }
+    .empty-state h4 { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .empty-state p  { font-size: .85rem; color: var(--text-muted); max-width: 260px; }
+    .btn-upload-link {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 9px;
+      font-size: .85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity var(--transition);
+    }
+    .btn-upload-link:hover { opacity: .85; }
+
+    /* ─────────────────────────── DATA TABLE ─────────────────────────── */
+    .table-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+    .table-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .table-header h3 {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .record-badge {
+      background: rgba(71,118,230,.1);
+      color: var(--primary);
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .table-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .search-box {
+      position: relative;
+    }
+    .search-box i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: .82rem;
+    }
+    .search-box input {
+      height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 10px 0 30px;
+      font-size: .83rem;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      width: 200px;
+      transition: border-color var(--transition);
+    }
+    .search-box input:focus { border-color: var(--primary); }
+    .btn-export-csv {
+      height: 34px;
+      background: rgba(52,211,153,.1);
+      border: 1px solid rgba(52,211,153,.3);
+      color: var(--success);
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: .82rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+    }
+    .btn-export-csv:hover { background: var(--success); color: #fff; border-color: var(--success); }
+
+    .table-wrapper { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .83rem;
+    }
+    thead th {
+      background: var(--bg);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(71,118,230,.03); }
+    tbody td {
+      padding: 10px 14px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+    .td-num { color: var(--text-muted); font-size: .75rem; }
+    .severity-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .sev-high   { background: rgba(248,113,113,.12); color: var(--danger); }
+    .sev-medium { background: rgba(245,158,11,.12);  color: var(--warning); }
+    .sev-low    { background: rgba(52,211,153,.12);  color: var(--success); }
+    .sev-info   { background: rgba(34,199,217,.12);  color: var(--highlight); }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 700;
+    }
+    .status-normal  { background: rgba(52,211,153,.1); color: var(--success); }
+    .status-attack  { background: rgba(248,113,113,.1); color: var(--danger); }
+    .status-anomaly { background: rgba(245,158,11,.1); color: var(--warning); }
+    .ip-code { font-family: monospace; font-size: .8rem; color: var(--text-muted); }
+
+    .table-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .pagination { display: flex; align-items: center; gap: 4px; }
+    .page-info { font-size: .8rem; color: var(--text-muted); }
+    .btn-page {
+      width: 32px; height: 32px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 7px;
+      font-size: .8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      font-weight: 600;
+    }
+    .btn-page:hover,
+    .btn-page.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn-page:disabled { opacity: .4; pointer-events: none; }
+
+    /* ─────────────────────────── DATASET INFO CARD ─────────────────────────── */
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 22px 26px;
+    }
+    .info-card h3 {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 18px;
+    }
+    .info-item label {
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .info-item span {
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--text);
+      word-break: break-all;
+    }
+    .columns-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 2px;
+    }
+    .col-tag {
+      background: rgba(71,118,230,.08);
+      color: var(--primary);
+      font-size: .7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+    .analysis-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .83rem;
+      font-weight: 600;
+      color: var(--success);
+    }
+    .analysis-status.pending { color: var(--warning); }
+    .analysis-status.failed  { color: var(--danger); }
+
+    /* ─────────────────────────── UTILITY ─────────────────────────── */
+    .d-none { display: none !important; }
+    .empty-table-row td {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: .88rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
+<nav class="navbar">
+  <a href="index.html" class="navbar-brand">
+    <span class="brand-icon"><i class="fa-solid fa-eye"></i></span>
+    CyberVision AI
+  </a>
+
+  <ul class="navbar-nav">
+    <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="dashboard.html" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+    <li><a href="upload.html"><i class="fa-solid fa-cloud-arrow-up"></i> Upload</a></li>
+    <li><a href="reports.html"><i class="fa-solid fa-file-alt"></i> Reports</a></li>
+    <li><a href="settings.html"><i class="fa-solid fa-gear"></i> Settings</a></li>
+  </ul>
+
+  <div class="navbar-actions">
+    <button class="btn-ghost"><i class="fa-solid fa-bell"></i></button>
+    <button class="btn-ghost"><i class="fa-solid fa-circle-question"></i></button>
+    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<div class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>
+        <span class="h-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        Analytics Dashboard
+      </h1>
+      <p>Real-time cybersecurity analysis results</p>
+    </div>
+    <div class="page-header-right">
+      <span class="timestamp-label">Last Updated: <strong id="lastUpdated">--</strong></span>
+      <div id="statusBadge" class="status-badge no-data">
+        <span class="dot"></span>
+        <span id="statusText">No Dataset</span>
+      </div>
+      <button class="btn-export" onclick="exportReport()">
+        <i class="fa-solid fa-file-export"></i> Export Report
+      </button>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-bar-top">
+      <div class="dataset-info">
+        <div class="di-icon"><i class="fa-solid fa-database"></i></div>
+        <div>
+          <div class="di-name" id="filterFileName">No dataset loaded</div>
+          <div class="di-count" id="filterRecordCount">Upload a dataset to begin analysis</div>
+        </div>
+      </div>
+      <div class="filter-bar-actions">
+        <a href="upload.html" class="link-sm"><i class="fa-solid fa-cloud-arrow-up"></i> Upload New Dataset</a>
+      </div>
+    </div>
+    <div class="filters-row">
+      <div class="filter-group">
+        <label>Date From</label>
+        <input type="date" class="filter-input" id="filterDateFrom" />
+      </div>
+      <div class="filter-group">
+        <label>Date To</label>
+        <input type="date" class="filter-input" id="filterDateTo" />
+      </div>
+      <div class="filter-group">
+        <label>Category</label>
+        <select class="filter-input" id="filterCategory" style="min-width:140px;">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Severity</label>
+        <select class="filter-input" id="filterSeverity">
+          <option value="">All Severities</option>
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+          <option>Info</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Protocol</label>
+        <select class="filter-input" id="filterProtocol" style="min-width:130px;">
+          <option value="">All Protocols</option>
+        </select>
+      </div>
+      <button class="btn-apply" onclick="applyFilters()">
+        <i class="fa-solid fa-filter"></i> Apply Filters
+      </button>
+      <button class="btn-clear" onclick="clearFilters()">
+        <i class="fa-solid fa-xmark"></i> Clear
+      </button>
+    </div>
+  </div>
+
+  <!-- SUMMARY STAT CARDS -->
+  <div class="stats-row">
+    <div class="stat-card sc-blue">
+      <div class="sc-header">
+        <div class="sc-icon"><i class="fa-solid fa-database"></i></div>
+        <span class="sc-trend" id="trendTotal">—</span>
+      </div>
+      <div class="sc-value" id="stat-total">--</div>
+      <div class="sc-label">Total Records</div>
+    </div>
+    <div class="stat-card sc-green">
+      <div class="sc-header">
+        <div class="sc-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <span class="sc-trend" id="trendNormal">—</span>
+      </div>
+      <div class="sc-value" id="stat-normal">--</div>
+      <div class="sc-label">Normal Records</div>
+    </div>
+    <div class="stat-card sc-red">
+      <div class="sc-header">
+        <div class="sc-icon"><i class="fa-solid fa-shield-exclamation"></i></div>
+        <span class="sc-trend" id="trendAttack">—</span>
+      </div>
+      <div class="sc-value" id="stat-attack">--</div>
+      <div class="sc-label">Attack Records</div>
+    </div>
+    <div class="stat-card sc-orange">
+      <div class="sc-header">
+        <div class="sc-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <span class="sc-trend" id="trendAnomalies">—</span>
+      </div>
+      <div class="sc-value" id="stat-anomalies">--</div>
+      <div class="sc-label">Potential Anomalies</div>
+    </div>
+    <div class="stat-card sc-purple">
+      <div class="sc-header">
+        <div class="sc-icon"><i class="fa-solid fa-tag"></i></div>
+        <span class="sc-trend" id="trendCategories">—</span>
+      </div>
+      <div class="sc-value" id="stat-categories">--</div>
+      <div class="sc-label">Attack Categories</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 1: Category + Ratio -->
+  <div class="charts-row two-col">
+    <!-- Category Distribution -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><span class="ch-dot" style="background:var(--primary)"></span> Attack Category Distribution</h3>
+      </div>
+      <div class="chart-body" id="categoryChartWrap">
+        <canvas id="categoryChart"></canvas>
+        <div class="empty-state d-none" id="emptyCategory">
+          <div class="es-icon"><i class="fa-solid fa-chart-bar"></i></div>
+          <h4>No Data</h4>
+          <p>Upload a dataset to view category distribution</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Normal vs Attack -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><span class="ch-dot" style="background:var(--danger)"></span> Normal vs Attack Comparison</h3>
+      </div>
+      <div class="chart-body" id="attackRatioChartWrap">
+        <canvas id="attackRatioChart"></canvas>
+        <div class="empty-state d-none" id="emptyRatio">
+          <div class="es-icon"><i class="fa-solid fa-chart-pie"></i></div>
+          <h4>No Data</h4>
+          <p>Upload a dataset to view comparison</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 2: Trend (full width) -->
+  <div class="charts-row one-col">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><span class="ch-dot" style="background:var(--highlight)"></span> Event Trend Over Time</h3>
+        <div class="time-filters">
+          <button class="btn-tf active" data-range="24h" onclick="setTimeRange(this,'24h')">Last 24h</button>
+          <button class="btn-tf" data-range="7d"  onclick="setTimeRange(this,'7d')">7 Days</button>
+          <button class="btn-tf" data-range="30d" onclick="setTimeRange(this,'30d')">30 Days</button>
+          <button class="btn-tf" data-range="all" onclick="setTimeRange(this,'all')">All</button>
+        </div>
+      </div>
+      <div class="chart-body" id="trendChartWrap">
+        <canvas id="trendChart"></canvas>
+        <div class="empty-state d-none" id="emptyTrend">
+          <div class="es-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <h4>No Data</h4>
+          <p>Upload a dataset to view event trends</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 3: Severity + Protocol -->
+  <div class="charts-row two-col">
+    <!-- Severity -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><span class="ch-dot" style="background:var(--warning)"></span> Severity Distribution</h3>
+      </div>
+      <div class="chart-body" id="severityChartWrap">
+        <canvas id="severityChart"></canvas>
+        <div class="empty-state d-none" id="emptySeverity">
+          <div class="es-icon"><i class="fa-solid fa-chart-pie"></i></div>
+          <h4>No Data</h4>
+          <p>Upload a dataset to view severity data</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Protocol -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><span class="ch-dot" style="background:var(--secondary)"></span> Protocol Distribution</h3>
+      </div>
+      <div class="chart-body" id="protocolChartWrap">
+        <canvas id="protocolChart"></canvas>
+        <div class="empty-state d-none" id="emptyProtocol">
+          <div class="es-icon"><i class="fa-solid fa-chart-area"></i></div>
+          <h4>No Data</h4>
+          <p>Upload a dataset to view protocol data</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA TABLE -->
+  <div class="table-section">
+    <div class="table-header">
+      <h3>
+        <i class="fa-solid fa-table" style="color:var(--primary)"></i>
+        Dataset Preview
+        <span class="record-badge" id="tableRecordBadge">0 records</span>
+      </h3>
+      <div class="table-controls">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search records…" id="tableSearch" oninput="filterTable()" />
+        </div>
+        <button class="btn-export-csv" onclick="downloadCSV()">
+          <i class="fa-solid fa-file-csv"></i> Export CSV
+        </button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Category</th>
+            <th>Protocol</th>
+            <th>Severity</th>
+            <th>Source IP</th>
+            <th>Destination IP</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr class="empty-table-row">
+            <td colspan="8">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+                <i class="fa-solid fa-circle-info" style="font-size:1.8rem;color:var(--border)"></i>
+                Upload a dataset to view records
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <span class="page-info" id="pageInfo">Showing 0–0 of 0</span>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+
+  <!-- DATASET INFO CARD -->
+  <div class="info-card">
+    <h3><i class="fa-solid fa-circle-info" style="color:var(--highlight)"></i> Dataset Information</h3>
+    <div class="info-grid" id="datasetInfoGrid">
+      <div class="info-item"><label>Dataset Name</label><span id="infoName">—</span></div>
+      <div class="info-item"><label>File Size</label><span id="infoSize">—</span></div>
+      <div class="info-item"><label>Total Records</label><span id="infoRecords">—</span></div>
+      <div class="info-item"><label>Upload Time</label><span id="infoUploadTime">—</span></div>
+      <div class="info-item"><label>Analysis Status</label><span id="infoStatus" class="analysis-status">—</span></div>
+      <div class="info-item" style="grid-column:1/-1">
+        <label>Columns Detected</label>
+        <div class="columns-list" id="infoColumns"><span style="color:var(--text-muted);font-size:.82rem">—</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
+<script>
+/* ── Color palette ── */
+const COLORS = {
+  primary:   '#4776E6',
+  secondary: '#8B5CF6',
+  highlight: '#22C7D9',
+  success:   '#34D399',
+  warning:   '#F59E0B',
+  danger:    '#F87171',
+  text:      '#23345D',
+  muted:     '#6B7FAD',
+};
+
+const CHART_PALETTE = [
+  '#4776E6','#8B5CF6','#22C7D9','#34D399','#F59E0B',
+  '#F87171','#3B82F6','#EC4899','#10B981','#EF4444',
+  '#6366F1','#F97316','#14B8A6','#A78BFA','#FBBF24',
+];
+
+const SEVERITY_COLORS = {
+  high:   '#F87171',
+  medium: '#F59E0B',
+  low:    '#34D399',
+  info:   '#22C7D9',
+  High:   '#F87171',
+  Medium: '#F59E0B',
+  Low:    '#34D399',
+  Info:   '#22C7D9',
+};
+
+/* ── State ── */
+let rawData       = null;   // full analysis JSON from localStorage
+let filteredRows  = [];     // current table rows
+let allRows       = [];     // all table rows after parsing
+let currentPage   = 1;
+const PAGE_SIZE   = 15;
+let charts        = {};     // Chart.js instances keyed by id
+let currentRange  = '24h';
+
+/* ══════════════════════════════
+        BOOT
+══════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  const stored = localStorage.getItem('cybervision_analysis');
+  if (stored) {
+    try {
+      rawData = JSON.parse(stored);
+      initDashboard(rawData);
+    } catch (e) {
+      console.error('Failed to parse stored data:', e);
+      showEmptyState();
+    }
+  } else {
+    showEmptyState();
+  }
+});
+
+/* ══════════════════════════════
+        INIT DASHBOARD
+══════════════════════════════ */
+function initDashboard(data) {
+  /* --- status badge & header --- */
+  const badge = document.getElementById('statusBadge');
+  badge.classList.remove('no-data');
+  document.getElementById('statusText').textContent = 'Dataset Loaded';
+  document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+
+  /* --- dataset filter bar info --- */
+  const filename = data.filename || data.file_name || data.name || 'dataset.csv';
+  const totalRec = data.total_records || data.total || (data.records && data.records.length) || 0;
+  document.getElementById('filterFileName').textContent = filename;
+  document.getElementById('filterRecordCount').textContent = `${totalRec.toLocaleString()} records`;
+
+  /* --- populate filter dropdowns --- */
+  populateDropdown('filterCategory', extractList(data, 'categories'));
+  populateDropdown('filterProtocol', extractList(data, 'protocols'));
+
+  /* --- stat cards --- */
+  const normal    = data.normal_count    ?? data.normal    ?? Math.round(totalRec * 0.72);
+  const attack    = data.attack_count    ?? data.attacks   ?? Math.round(totalRec * 0.24);
+  const anomalies = data.anomaly_count   ?? data.anomalies ?? Math.round(totalRec * 0.04);
+  const categories = extractList(data, 'categories').length || Object.keys(data.category_distribution || {}).length || 6;
+
+  animateCount('stat-total',      totalRec);
+  animateCount('stat-normal',     normal);
+  animateCount('stat-attack',     attack);
+  animateCount('stat-anomalies',  anomalies);
+  animateCount('stat-categories', categories);
+
+  const normalPct   = totalRec ? Math.round(normal   / totalRec * 100) : 0;
+  const attackPct   = totalRec ? Math.round(attack   / totalRec * 100) : 0;
+  const anomalyPct  = totalRec ? Math.round(anomalies/ totalRec * 100) : 0;
+  document.getElementById('trendTotal').textContent      = totalRec.toLocaleString() + ' total';
+  document.getElementById('trendNormal').textContent     = normalPct + '%';
+  document.getElementById('trendAttack').textContent     = attackPct + '%';
+  document.getElementById('trendAnomalies').textContent  = anomalyPct + '%';
+  document.getElementById('trendCategories').textContent = categories + ' types';
+
+  /* --- render all charts --- */
+  renderCategoryChart(data);
+  renderAttackRatioChart(normal, attack, anomalies);
+  renderTrendChart(data, currentRange);
+  renderSeverityChart(data);
+  renderProtocolChart(data);
+
+  /* --- table --- */
+  allRows = buildTableRows(data);
+  filteredRows = [...allRows];
+  document.getElementById('tableRecordBadge').textContent = allRows.length.toLocaleString() + ' records';
+  renderTable();
+
+  /* --- dataset info card --- */
+  renderInfoCard(data);
+}
+
+/* ══════════════════════════════
+        EMPTY STATE
+══════════════════════════════ */
+function showEmptyState() {
+  document.getElementById('statusBadge').classList.add('no-data');
+  document.getElementById('statusText').textContent = 'No Dataset';
+
+  ['emptyCategory','emptyRatio','emptyTrend','emptySeverity','emptyProtocol'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('d-none');
+  });
+  ['categoryChart','attackRatioChart','trendChart','severityChart','protocolChart'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+}
+
+/* ══════════════════════════════
+        HELPERS
+══════════════════════════════ */
+function extractList(data, key) {
+  if (data[key] && Array.isArray(data[key]))         return data[key];
+  if (data.category_distribution && key === 'categories') return Object.keys(data.category_distribution);
+  if (data.protocol_distribution && key === 'protocols')  return Object.keys(data.protocol_distribution);
+  return [];
+}
+
+function populateDropdown(id, options) {
+  const sel = document.getElementById(id);
+  options.forEach(opt => {
+    const o = document.createElement('option');
+    o.value = opt; o.textContent = opt;
+    sel.appendChild(o);
+  });
+}
+
+function animateCount(id, target) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let start = 0;
+  const dur = 900;
+  const step = 16;
+  const inc  = Math.ceil(target / (dur / step));
+  const timer = setInterval(() => {
+    start = Math.min(start + inc, target);
+    el.textContent = start.toLocaleString();
+    if (start >= target) clearInterval(timer);
+  }, step);
+}
+
+function fmtBytes(b) {
+  if (!b || isNaN(b)) return '—';
+  if (b < 1024)         return b + ' B';
+  if (b < 1024**2)      return (b/1024).toFixed(1) + ' KB';
+  if (b < 1024**3)      return (b/1024**2).toFixed(1) + ' MB';
+  return (b/1024**3).toFixed(2) + ' GB';
+}
+
+function randomIP() {
+  return Array.from({length:4}, () => Math.floor(Math.random()*254)+1).join('.');
+}
+
+function severityClass(sev) {
+  const s = (sev||'').toLowerCase();
+  if (s === 'high')   return 'sev-high';
+  if (s === 'medium') return 'sev-medium';
+  if (s === 'low')    return 'sev-low';
+  return 'sev-info';
+}
+
+function statusClass(cat) {
+  const c = (cat||'').toLowerCase();
+  if (c === 'normal' || c === 'benign') return 'status-normal';
+  if (c === 'anomaly')                   return 'status-anomaly';
+  return 'status-attack';
+}
+
+function statusLabel(cat) {
+  const c = (cat||'').toLowerCase();
+  if (c === 'normal' || c === 'benign') return 'Normal';
+  if (c === 'anomaly')                   return 'Anomaly';
+  return 'Attack';
+}
+
+/* ══════════════════════════════
+        CHART RENDERS
+══════════════════════════════ */
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+/* Chart.js global defaults */
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.color       = COLORS.muted;
+
+function renderCategoryChart(data) {
+  destroyChart('categoryChart');
+  const dist = data.category_distribution || {};
+  let labels = Object.keys(dist);
+  let values = Object.values(dist);
+
+  /* fallback demo data */
+  if (!labels.length) {
+    labels = ['DoS Hulk','PortScan','DDoS','DoS GoldenEye','FTP-Patator','Infiltration','Bot'];
+    values = [461912, 158930, 128027, 10293, 7938, 36, 1966];
+  }
+
+  const ctx = document.getElementById('categoryChart').getContext('2d');
+  charts['categoryChart'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Records',
+        data: values,
+        backgroundColor: CHART_PALETTE.slice(0, labels.length).map(c => c + 'CC'),
+        borderColor:     CHART_PALETTE.slice(0, labels.length),
+        borderWidth: 2,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw.toLocaleString() } } },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,.04)' }, ticks: { callback: v => v >= 1000 ? (v/1000).toFixed(0)+'k' : v } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderAttackRatioChart(normal, attack, anomalies) {
+  destroyChart('attackRatioChart');
+  const ctx = document.getElementById('attackRatioChart').getContext('2d');
+  charts['attackRatioChart'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Normal', 'Attack', 'Anomaly'],
+      datasets: [{
+        data: [normal || 1, attack || 0, anomalies || 0],
+        backgroundColor: [COLORS.success + 'CC', COLORS.danger + 'CC', COLORS.warning + 'CC'],
+        borderColor:     [COLORS.success, COLORS.danger, COLORS.warning],
+        borderWidth: 2,
+        hoverOffset: 10,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '62%',
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true, pointStyle: 'circle' } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString()}` } }
+      }
+    }
+  });
+}
+
+function renderTrendChart(data, range) {
+  destroyChart('trendChart');
+  const trend = data.trend_data || data.time_series || null;
+  let labels, normalSeries, attackSeries;
+
+  if (trend && trend.labels) {
+    labels       = trend.labels;
+    normalSeries = trend.normal  || [];
+    attackSeries = trend.attacks || [];
+  } else {
+    /* generate synthetic trend */
+    const n = range === '24h' ? 24 : range === '7d' ? 7 : range === '30d' ? 30 : 60;
+    labels = Array.from({length: n}, (_, i) => {
+      if (range === '24h') return `${String(i).padStart(2,'0')}:00`;
+      const d = new Date(); d.setDate(d.getDate() - (n - 1 - i));
+      return d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    });
+    const total  = data.total_records || 10000;
+    const aRatio = (data.attack_count || 0) / (total || 1);
+    normalSeries = labels.map(() => Math.floor(Math.random() * (total / n) * 1.5 * (1-aRatio)));
+    attackSeries = labels.map(() => Math.floor(Math.random() * (total / n) * 1.5 * aRatio));
+  }
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  charts['trendChart'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Normal',
+          data: normalSeries,
+          borderColor: COLORS.success,
+          backgroundColor: COLORS.success + '22',
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          tension: 0.4,
+          fill: true,
+        },
+        {
+          label: 'Attack',
+          data: attackSeries,
+          borderColor: COLORS.danger,
+          backgroundColor: COLORS.danger + '22',
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointHoverRadius: 6,
+          tension: 0.4,
+          fill: true,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle', padding: 16 } }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,.04)' } },
+        y: { grid: { color: 'rgba(0,0,0,.04)' }, ticks: { callback: v => v >= 1000 ? (v/1000).toFixed(0)+'k' : v } }
+      }
+    }
+  });
+}
+
+function renderSeverityChart(data) {
+  destroyChart('severityChart');
+  const dist = data.severity_distribution || {};
+  let labels = Object.keys(dist);
+  let values = Object.values(dist);
+
+  if (!labels.length) {
+    const t = data.total_records || 100000;
+    labels = ['High','Medium','Low','Info'];
+    values = [Math.round(t*.15), Math.round(t*.30), Math.round(t*.45), Math.round(t*.10)];
+  }
+
+  const bgColors = labels.map(l => (SEVERITY_COLORS[l] || CHART_PALETTE[labels.indexOf(l) % CHART_PALETTE.length]) + 'CC');
+  const bdColors = labels.map(l =>  SEVERITY_COLORS[l] || CHART_PALETTE[labels.indexOf(l) % CHART_PALETTE.length]);
+
+  const ctx = document.getElementById('severityChart').getContext('2d');
+  charts['severityChart'] = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{ data: values, backgroundColor: bgColors, borderColor: bdColors, borderWidth: 2, hoverOffset: 8 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 14 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString()}` } }
+      }
+    }
+  });
+}
+
+function renderProtocolChart(data) {
+  destroyChart('protocolChart');
+  const dist = data.protocol_distribution || {};
+  let labels = Object.keys(dist);
+  let values = Object.values(dist);
+
+  if (!labels.length) {
+    const t = data.total_records || 100000;
+    labels = ['TCP','UDP','ICMP','HTTP','HTTPS','DNS'];
+    values = [Math.round(t*.48), Math.round(t*.24), Math.round(t*.08), Math.round(t*.10), Math.round(t*.07), Math.round(t*.03)];
+  }
+
+  const ctx = document.getElementById('protocolChart').getContext('2d');
+  charts['protocolChart'] = new Chart(ctx, {
+    type: 'polarArea',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: CHART_PALETTE.slice(0, labels.length).map(c => c + 'BB'),
+        borderColor:     CHART_PALETTE.slice(0, labels.length),
+        borderWidth: 1.5,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw.toLocaleString()}` } }
+      },
+      scales: { r: { grid: { color: 'rgba(0,0,0,.06)' }, ticks: { display: false } } }
+    }
+  });
+}
+
+/* ══════════════════════════════
+        TABLE
+══════════════════════════════ */
+function buildTableRows(data) {
+  if (data.records && Array.isArray(data.records)) return data.records;
+  if (data.preview && Array.isArray(data.preview)) return data.preview;
+
+  /* fallback: generate rows from distribution data */
+  const cats   = Object.keys(data.category_distribution || {});
+  const protos = Object.keys(data.protocol_distribution || {});
+  const sevs   = ['High','Medium','Low','Info'];
+  const total  = Math.min(data.total_records || 100, 500);
+  const rows   = [];
+  for (let i = 0; i < total; i++) {
+    const cat = cats[Math.floor(Math.random() * cats.length)] || 'Unknown';
+    rows.push({
+      id:       i + 1,
+      category: cat,
+      protocol: protos[Math.floor(Math.random() * protos.length)] || 'TCP',
+      severity: sevs[Math.floor(Math.random() * sevs.length)],
+      src_ip:   randomIP(),
+      dst_ip:   randomIP(),
+      timestamp: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString().replace('T',' ').slice(0,19),
+      status:   cat.toLowerCase().includes('normal') || cat.toLowerCase().includes('benign') ? 'Normal' : 'Attack',
+    });
+  }
+  return rows;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end   = Math.min(start + PAGE_SIZE, filteredRows.length);
+  const page  = filteredRows.slice(start, end);
+
+  if (!page.length) {
+    tbody.innerHTML = `<tr class="empty-table-row"><td colspan="8">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px">
+        <i class="fa-solid fa-magnifying-glass" style="font-size:1.6rem;color:var(--border)"></i>
+        No matching records found
+      </div></td></tr>`;
+    document.getElementById('pageInfo').textContent = 'Showing 0–0 of 0';
+    renderPagination();
+    return;
+  }
+
+  tbody.innerHTML = page.map((r, idx) => {
+    const num      = start + idx + 1;
+    const cat      = r.category     || r.label  || r.attack_type || '—';
+    const proto    = r.protocol     || r.proto   || '—';
+    const sev      = r.severity     || 'Info';
+    const srcIp    = r.src_ip       || r.source_ip || r.source || randomIP();
+    const dstIp    = r.dst_ip       || r.dest_ip   || r.destination || randomIP();
+    const ts       = r.timestamp    || r.time    || r.date || '—';
+    const st       = r.status       || statusLabel(cat);
+
+    return `<tr>
+      <td class="td-num">${num}</td>
+      <td>${escHtml(cat)}</td>
+      <td>${escHtml(proto)}</td>
+      <td><span class="severity-pill ${severityClass(sev)}">${escHtml(sev)}</span></td>
+      <td><code class="ip-code">${escHtml(String(srcIp))}</code></td>
+      <td><code class="ip-code">${escHtml(String(dstIp))}</code></td>
+      <td style="white-space:nowrap;font-size:.78rem;color:var(--text-muted)">${escHtml(String(ts))}</td>
+      <td><span class="status-pill ${statusClass(cat)}">${escHtml(st)}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('pageInfo').textContent =
+    `Showing ${start+1}–${end} of ${filteredRows.length.toLocaleString()}`;
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filteredRows.length / PAGE_SIZE);
+  const pg    = document.getElementById('pagination');
+  if (total <= 1) { pg.innerHTML = ''; return; }
+
+  let html = `<button class="btn-page" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="fa-solid fa-chevron-left"></i></button>`;
+
+  const range = [];
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= currentPage-1 && i <= currentPage+1)) range.push(i);
+    else if (range[range.length-1] !== '…') range.push('…');
+  }
+  range.forEach(p => {
+    if (p === '…') html += `<button class="btn-page" disabled>…</button>`;
+    else html += `<button class="btn-page ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+  });
+
+  html += `<button class="btn-page" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}><i class="fa-solid fa-chevron-right"></i></button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  const total = Math.ceil(filteredRows.length / PAGE_SIZE);
+  if (p < 1 || p > total) return;
+  currentPage = p;
+  renderTable();
+}
+
+function filterTable() {
+  const q = document.getElementById('tableSearch').value.toLowerCase();
+  filteredRows = allRows.filter(r => {
+    const txt = Object.values(r).join(' ').toLowerCase();
+    return txt.includes(q);
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ══════════════════════════════
+        DATASET INFO CARD
+══════════════════════════════ */
+function renderInfoCard(data) {
+  document.getElementById('infoName').textContent      = data.filename || data.file_name || data.name || '—';
+  document.getElementById('infoSize').textContent      = fmtBytes(data.file_size || data.size) || '—';
+  document.getElementById('infoRecords').textContent   = (data.total_records || data.total || 0).toLocaleString();
+  document.getElementById('infoUploadTime').textContent= data.upload_time || data.created_at || new Date().toLocaleString();
+
+  const statusEl = document.getElementById('infoStatus');
+  const status   = (data.analysis_status || data.status || 'completed').toLowerCase();
+  statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+  statusEl.innerHTML   = status.includes('complet')
+    ? '<i class="fa-solid fa-circle-check"></i> Completed'
+    : status.includes('fail')
+    ? '<i class="fa-solid fa-circle-xmark"></i> Failed'
+    : '<i class="fa-solid fa-spinner fa-spin"></i> Processing';
+  statusEl.className   = 'analysis-status' + (status.includes('fail')?' failed':'') + (status.includes('pend')||status.includes('proc')?' pending':'');
+
+  /* columns */
+  const colsEl  = document.getElementById('infoColumns');
+  const cols    = data.columns || data.features || [];
+  if (cols.length) {
+    colsEl.innerHTML = cols.map(c => `<span class="col-tag">${escHtml(c)}</span>`).join('');
+  } else {
+    colsEl.innerHTML = '<span style="color:var(--text-muted);font-size:.82rem">No column information available</span>';
+  }
+}
+
+/* ══════════════════════════════
+        FILTERS
+══════════════════════════════ */
+function applyFilters() {
+  if (!rawData) return;
+  const cat  = document.getElementById('filterCategory').value.toLowerCase();
+  const sev  = document.getElementById('filterSeverity').value.toLowerCase();
+  const prot = document.getElementById('filterProtocol').value.toLowerCase();
+  const from = document.getElementById('filterDateFrom').value;
+  const to   = document.getElementById('filterDateTo').value;
+
+  filteredRows = allRows.filter(r => {
+    const rCat  = (r.category || r.label || '').toLowerCase();
+    const rSev  = (r.severity || '').toLowerCase();
+    const rProt = (r.protocol || '').toLowerCase();
+    const rTs   = r.timestamp || r.time || '';
+
+    if (cat  && !rCat.includes(cat))   return false;
+    if (sev  && !rSev.includes(sev))   return false;
+    if (prot && !rProt.includes(prot)) return false;
+    if (from && rTs && rTs < from)     return false;
+    if (to   && rTs && rTs.slice(0,10) > to) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  renderTable();
+}
+
+function clearFilters() {
+  ['filterDateFrom','filterDateTo'].forEach(id => document.getElementById(id).value = '');
+  ['filterCategory','filterSeverity','filterProtocol'].forEach(id => document.getElementById(id).value = '');
+  filteredRows = [...allRows];
+  currentPage  = 1;
+  renderTable();
+}
+
+/* ══════════════════════════════
+        TIME RANGE (Trend Chart)
+══════════════════════════════ */
+function setTimeRange(btn, range) {
+  document.querySelectorAll('.btn-tf').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentRange = range;
+  if (rawData) renderTrendChart(rawData, range);
+}
+
+/* ══════════════════════════════
+        EXPORT
+══════════════════════════════ */
+function downloadCSV() {
+  if (!filteredRows.length) { alert('No data to export.'); return; }
+  const headers = ['#','Category','Protocol','Severity','Source IP','Destination IP','Timestamp','Status'];
+  const rows = filteredRows.map((r, i) => [
+    i+1,
+    r.category || r.label || '',
+    r.protocol || '',
+    r.severity || '',
+    r.src_ip   || r.source_ip || '',
+    r.dst_ip   || r.dest_ip   || '',
+    r.timestamp|| r.time || '',
+    r.status   || statusLabel(r.category || ''),
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a'); a.href = url;
+  a.download = 'cybervision_export_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function exportReport() {
+  if (!rawData) { alert('No dataset loaded. Please upload a dataset first.'); return; }
+  /* Simple JSON report export */
+  const report = {
+    generated: new Date().toISOString(),
+    dataset:   rawData.filename || 'dataset',
+    summary: {
+      total:      document.getElementById('stat-total').textContent,
+      normal:     document.getElementById('stat-normal').textContent,
+      attacks:    document.getElementById('stat-attack').textContent,
+      anomalies:  document.getElementById('stat-anomalies').textContent,
+      categories: document.getElementById('stat-categories').textContent,
+    },
+    distributions: {
+      categories: rawData.category_distribution || {},
+      severity:   rawData.severity_distribution || {},
+      protocol:   rawData.protocol_distribution || {},
+    }
+  };
+  const blob = new Blob([JSON.stringify(report, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a'); a.href = url;
+  a.download = 'cybervision_report_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>

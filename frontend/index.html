@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberVision AI - Cybersecurity Analytics Platform</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- External stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* ===== CSS VARIABLES ===== */
+    :root {
+      --bg-main:        #F4F8FF;
+      --card-bg:        #FFFFFF;
+      --primary:        #4776E6;
+      --secondary:      #8B5CF6;
+      --highlight:      #22C7D9;
+      --success:        #34D399;
+      --warning:        #F59E0B;
+      --danger:         #F87171;
+      --text-main:      #23345D;
+      --text-muted:     #64748B;
+      --text-light:     #94A3B8;
+      --border:         #E2E8F0;
+      --shadow-sm:      0 1px 3px rgba(35,52,93,.08), 0 1px 2px rgba(35,52,93,.04);
+      --shadow-md:      0 4px 16px rgba(35,52,93,.10);
+      --shadow-lg:      0 10px 40px rgba(35,52,93,.14);
+      --shadow-xl:      0 20px 60px rgba(35,52,93,.18);
+      --gradient-primary: linear-gradient(135deg, #4776E6 0%, #8B5CF6 100%);
+      --gradient-hero:    linear-gradient(135deg, #F4F8FF 0%, #EBF3FF 50%, #F0F4FF 100%);
+      --radius-sm:      8px;
+      --radius-md:      12px;
+      --radius-lg:      20px;
+      --radius-xl:      28px;
+      --transition:     all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; }
+    ul { list-style: none; }
+
+    /* ===== UTILITIES ===== */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .gradient-text {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(71,118,230,.10);
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 48px;
+    }
+    .text-center { text-align: center; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(71,118,230,.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(71,118,230,.45);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    .btn-outline:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .btn-white {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-white:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* ================================================================
+       NAVIGATION
+    ================================================================ */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 20px rgba(35,52,93,.07);
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+      gap: 24px;
+    }
+
+    /* Logo */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .nav-logo .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .nav-logo span {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* Nav links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-links a {
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--primary);
+      background: rgba(71,118,230,.08);
+    }
+
+    /* Nav CTA */
+    .nav-cta { flex-shrink: 0; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-main);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px 20px;
+      box-shadow: var(--shadow-lg);
+      flex-direction: column;
+      gap: 4px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .mobile-menu a:hover { color: var(--primary); background: rgba(71,118,230,.08); }
+    .mobile-menu .btn { margin-top: 8px; justify-content: center; }
+
+    /* ================================================================
+       HERO SECTION
+    ================================================================ */
+    .hero {
+      background: var(--gradient-hero);
+      position: relative;
+      overflow: hidden;
+      padding: 90px 0 80px;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(71,118,230,.10) 0%, transparent 70%);
+      top: -200px;
+      right: -100px;
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,.08) 0%, transparent 70%);
+      bottom: -100px;
+      left: -50px;
+      pointer-events: none;
+    }
+
+    /* Floating particles */
+    .particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.25;
+      animation: floatParticle var(--dur, 8s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+    }
+    @keyframes floatParticle {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: .15; }
+      50%       { transform: translateY(-30px) rotate(180deg); opacity: .35; }
+    }
+
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero left */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(71,118,230,.12);
+      border: 1px solid rgba(71,118,230,.25);
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 50px;
+      margin-bottom: 22px;
+      animation: fadeInDown 0.6s ease both;
+    }
+    .hero-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--text-main);
+      margin-bottom: 20px;
+      animation: fadeInDown 0.6s ease 0.1s both;
+    }
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 32px;
+      max-width: 500px;
+      animation: fadeInDown 0.6s ease 0.2s both;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 44px;
+      animation: fadeInDown 0.6s ease 0.3s both;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      animation: fadeInDown 0.6s ease 0.4s both;
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      display: block;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+
+    /* Hero right – SVG illustration */
+    .hero-illustration {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeInRight 0.8s ease 0.2s both;
+    }
+    .hero-illustration svg {
+      width: 100%;
+      max-width: 520px;
+      height: auto;
+      filter: drop-shadow(0 20px 50px rgba(71,118,230,.15));
+    }
+
+    /* SVG Animations */
+    @keyframes blink {
+      0%, 100% { opacity: 1; r: 6; }
+      50%       { opacity: 0.3; r: 4; }
+    }
+    @keyframes dashFlow {
+      to { stroke-dashoffset: -200; }
+    }
+    @keyframes pulseRing {
+      0%   { r: 12; opacity: .6; }
+      100% { r: 24; opacity: 0; }
+    }
+    @keyframes shieldPulse {
+      0%, 100% { transform: scale(1) translateY(0); }
+      50%       { transform: scale(1.04) translateY(-4px); }
+    }
+    @keyframes dataFlow {
+      0%   { stroke-dashoffset: 400; opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); transform-origin: 260px 180px; }
+    }
+    .node-blink { animation: blink 2s ease-in-out infinite; }
+    .node-blink-2 { animation: blink 2.5s ease-in-out 0.5s infinite; }
+    .node-blink-3 { animation: blink 3s ease-in-out 1s infinite; }
+    .flow-line { animation: dashFlow 3s linear infinite; }
+    .flow-line-2 { animation: dashFlow 3.5s linear 0.8s infinite; }
+    .flow-line-3 { animation: dashFlow 4s linear 1.5s infinite; }
+    .pulse-ring { animation: pulseRing 2s ease-out infinite; }
+    .pulse-ring-2 { animation: pulseRing 2s ease-out 0.7s infinite; }
+    .shield-group { animation: shieldPulse 3s ease-in-out infinite; transform-origin: 260px 160px; }
+    .data-packet { animation: dataFlow 3s linear infinite; }
+    .data-packet-2 { animation: dataFlow 3s linear 1.5s infinite; }
+
+    /* Entry keyframes */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================================================================
+       FEATURES SECTION
+    ================================================================ */
+    .features { padding: 96px 0; background: #fff; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--gradient-primary));
+      border-radius: 3px 3px 0 0;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+      border-color: transparent;
+    }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: #fff;
+      margin-bottom: 22px;
+      flex-shrink: 0;
+    }
+    .feature-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+    .feature-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ================================================================
+       HOW IT WORKS
+    ================================================================ */
+    .how-it-works { padding: 96px 0; background: var(--bg-main); }
+    .steps-wrapper {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+      margin-top: 20px;
+    }
+    .steps-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 44px;
+      left: calc(12.5% + 28px);
+      right: calc(12.5% + 28px);
+      height: 2px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      z-index: 0;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .step-bubble {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(71,118,230,.2);
+      transition: var(--transition);
+    }
+    .step-bubble .step-num {
+      font-size: 1.3rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .step:hover .step-bubble {
+      background: var(--gradient-primary);
+      color: #fff;
+      border-color: transparent;
+      transform: scale(1.08);
+    }
+    .step-bubble i { font-size: 1.3rem; margin-bottom: 2px; }
+    .step-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+    .step-desc { font-size: 0.87rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ================================================================
+       STATS BANNER
+    ================================================================ */
+    .stats-banner {
+      background: var(--gradient-primary);
+      padding: 60px 0;
+    }
+    .stats-banner .container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      text-align: center;
+    }
+    .banner-stat { color: #fff; }
+    .banner-stat .val {
+      display: block;
+      font-family: 'Poppins', sans-serif;
+      font-size: 2.6rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .banner-stat .lbl {
+      font-size: 0.95rem;
+      opacity: .85;
+      font-weight: 500;
+    }
+
+    /* ================================================================
+       DASHBOARD PREVIEW
+    ================================================================ */
+    .preview { padding: 96px 0; background: #fff; }
+    .preview-wrapper {
+      background: linear-gradient(135deg, #F8FAFF 0%, #F0F4FF 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      box-shadow: var(--shadow-xl);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .preview-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .preview-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .preview-title-bar {
+      flex: 1;
+      height: 12px;
+      background: var(--border);
+      border-radius: 6px;
+      margin: 0 8px;
+    }
+    .preview-stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .pstat {
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .pstat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    .pstat-value {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .pstat-trend {
+      font-size: 0.72rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .pstat-trend.up { color: var(--success); }
+    .pstat-trend.down { color: var(--danger); }
+    .chart-container-preview {
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      height: 240px;
+      margin-bottom: 24px;
+    }
+    .preview-footer { text-align: center; }
+
+    /* ================================================================
+       USE CASES / TESTIMONIALS
+    ================================================================ */
+    .use-cases { padding: 96px 0; background: var(--bg-main); }
+    .usecase-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .usecase-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .usecase-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+      border-color: transparent;
+    }
+    .usecase-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 20px;
+    }
+    .usecase-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+    .usecase-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 20px;
+    }
+    .usecase-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .tag {
+      background: rgba(71,118,230,.10);
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 50px;
+    }
+
+    /* ================================================================
+       FOOTER
+    ================================================================ */
+    .footer {
+      background: var(--text-main);
+      color: rgba(255,255,255,.7);
+      padding: 64px 0 32px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand .nav-logo { margin-bottom: 16px; }
+    .footer-brand .nav-logo .logo-icon { background: rgba(255,255,255,.15); }
+    .footer-brand .nav-logo span { color: #fff; }
+    .footer-tagline { font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
+    .footer-socials { display: flex; gap: 12px; }
+    .social-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,.8);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+    .social-btn:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
+    .footer-col h4 {
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: .3px;
+    }
+    .footer-col ul { display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a {
+      font-size: 0.88rem;
+      color: rgba(255,255,255,.6);
+      transition: color .2s;
+    }
+    .footer-col ul a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.84rem;
+    }
+    .footer-bottom-links { display: flex; gap: 24px; }
+    .footer-bottom-links a { color: rgba(255,255,255,.5); transition: color .2s; }
+    .footer-bottom-links a:hover { color: #fff; }
+
+    /* ================================================================
+       RESPONSIVE
+    ================================================================ */
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 900px) {
+      .hero .container { grid-template-columns: 1fr; gap: 48px; }
+      .hero-illustration { display: none; }
+      .steps-wrapper { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .steps-wrapper::before { display: none; }
+      .stats-banner .container { grid-template-columns: repeat(2, 1fr); }
+      .usecase-grid { grid-template-columns: 1fr; max-width: 520px; margin: 0 auto; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .features-grid { grid-template-columns: 1fr; }
+      .preview-stat-cards { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+    @media (max-width: 480px) {
+      .hero-stats { gap: 20px; }
+      .stats-banner .container { grid-template-columns: repeat(2, 1fr); }
+      .preview-stat-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ================================================================
+     NAVIGATION
+================================================================ -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <!-- Logo -->
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <span class="gradient-text">CyberVision AI</span>
+    </a>
+
+    <!-- Center Nav Links -->
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="upload.html">Upload</a>
+      <a href="analysis.html">Analysis</a>
+      <a href="anomaly.html">Anomaly Detection</a>
+      <a href="reports.html">Reports</a>
+      <a href="about.html">About</a>
+    </div>
+
+    <!-- CTA -->
+    <div class="nav-cta">
+      <a href="upload.html" class="btn btn-primary">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Upload Dataset
+      </a>
+    </div>
+
+    <!-- Hamburger -->
+    <div class="hamburger" id="hamburger" aria-label="Open menu" role="button" tabindex="0">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="analysis.html">Analysis</a>
+    <a href="anomaly.html">Anomaly Detection</a>
+    <a href="reports.html">Reports</a>
+    <a href="about.html">About</a>
+    <a href="upload.html" class="btn btn-primary">
+      <i class="fa-solid fa-cloud-arrow-up"></i> Upload Dataset
+    </a>
+  </div>
+</nav>
+
+<!-- ================================================================
+     HERO SECTION
+================================================================ -->
+<section class="hero" id="home">
+  <!-- Floating particles -->
+  <div class="particles" aria-hidden="true">
+    <div class="particle" style="width:14px;height:14px;background:#4776E6;top:15%;left:8%;--dur:7s;--delay:0s;"></div>
+    <div class="particle" style="width:10px;height:10px;background:#8B5CF6;top:30%;left:20%;--dur:9s;--delay:1s;"></div>
+    <div class="particle" style="width:18px;height:18px;background:#22C7D9;top:65%;left:5%;--dur:6s;--delay:2s;"></div>
+    <div class="particle" style="width:8px;height:8px;background:#34D399;top:80%;left:18%;--dur:11s;--delay:0.5s;"></div>
+    <div class="particle" style="width:12px;height:12px;background:#F59E0B;top:10%;right:15%;--dur:8.5s;--delay:1.5s;"></div>
+    <div class="particle" style="width:16px;height:16px;background:#4776E6;top:50%;right:8%;--dur:7.5s;--delay:3s;"></div>
+    <div class="particle" style="width:10px;height:10px;background:#F87171;top:75%;right:20%;--dur:10s;--delay:0.8s;"></div>
+    <div class="particle" style="width:6px;height:6px;background:#8B5CF6;top:40%;right:30%;--dur:13s;--delay:2.2s;"></div>
+  </div>
+
+  <div class="container">
+    <!-- Left Content -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        🛡️ AI-Powered Security Analytics
+      </div>
+      <h1 class="hero-title">
+        Turn Cybersecurity Data Into
+        <span class="gradient-text">Actionable Insights</span>
+      </h1>
+      <p class="hero-desc">
+        CyberVision AI transforms raw network traffic data into rich, interactive visualizations.
+        Detect anomalies, identify attack patterns, and generate comprehensive reports — all in one platform.
+      </p>
+      <div class="hero-btns">
+        <a href="dashboard.html" class="btn btn-primary">
+          <i class="fa-solid fa-gauge-high"></i>
+          Explore Dashboard
+        </a>
+        <a href="upload.html" class="btn btn-outline">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          Upload Dataset
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-value">10K+</span>
+          <span class="stat-label">Records Analyzed</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">99.2%</span>
+          <span class="stat-label">Detection Rate</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">50+</span>
+          <span class="stat-label">Chart Types</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: SVG Illustration -->
+    <div class="hero-illustration">
+      <svg viewBox="0 0 520 440" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cybersecurity network visualization">
+        <!-- Background card -->
+        <rect x="20" y="20" width="480" height="400" rx="24" fill="white" fill-opacity="0.7" stroke="#E2E8F0" stroke-width="1.5"/>
+
+        <!-- Grid lines -->
+        <line x1="60" y1="40" x2="60" y2="400" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="160" y1="40" x2="160" y2="400" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="260" y1="40" x2="260" y2="400" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="360" y1="40" x2="360" y2="400" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="460" y1="40" x2="460" y2="400" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="40" y1="100" x2="480" y2="100" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="40" y1="200" x2="480" y2="200" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+        <line x1="40" y1="300" x2="480" y2="300" stroke="#E8EFFF" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- Connection lines between nodes (with flow animation) -->
+        <line x1="260" y1="170" x2="140" y2="270" stroke="#4776E6" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.6"/>
+        <line x1="260" y1="170" x2="380" y2="270" stroke="#8B5CF6" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.6"/>
+        <line x1="260" y1="170" x2="260" y2="330" stroke="#22C7D9" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.6"/>
+        <line x1="140" y1="270" x2="90" y2="360" stroke="#4776E6" stroke-width="1" stroke-dasharray="6 4" opacity="0.4"/>
+        <line x1="380" y1="270" x2="430" y2="360" stroke="#8B5CF6" stroke-width="1" stroke-dasharray="6 4" opacity="0.4"/>
+        <line x1="140" y1="270" x2="260" y2="330" stroke="#34D399" stroke-width="1" stroke-dasharray="6 4" opacity="0.4"/>
+        <line x1="380" y1="270" x2="260" y2="330" stroke="#F59E0B" stroke-width="1" stroke-dasharray="6 4" opacity="0.4"/>
+
+        <!-- Animated data flow on lines -->
+        <circle class="data-packet" r="4" fill="#4776E6">
+          <animateMotion dur="2.5s" repeatCount="indefinite" begin="0s">
+            <mpath href="#path1"/>
+          </animateMotion>
+        </circle>
+        <path id="path1" d="M260,170 L140,270" stroke="none"/>
+
+        <circle class="data-packet-2" r="4" fill="#8B5CF6">
+          <animateMotion dur="2.8s" repeatCount="indefinite" begin="0.8s">
+            <mpath href="#path2"/>
+          </animateMotion>
+        </circle>
+        <path id="path2" d="M260,170 L380,270" stroke="none"/>
+
+        <circle r="4" fill="#22C7D9" opacity="0.9">
+          <animateMotion dur="3s" repeatCount="indefinite" begin="1.4s">
+            <mpath href="#path3"/>
+          </animateMotion>
+        </circle>
+        <path id="path3" d="M260,170 L260,330" stroke="none"/>
+
+        <!-- Pulse rings around center node -->
+        <circle cx="260" cy="170" r="12" fill="none" stroke="#4776E6" stroke-width="1.5" opacity="0.6">
+          <animate attributeName="r" values="14;30" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="260" cy="170" r="12" fill="none" stroke="#8B5CF6" stroke-width="1.5" opacity="0.6">
+          <animate attributeName="r" values="14;30" dur="2s" repeatCount="indefinite" begin="0.7s"/>
+          <animate attributeName="opacity" values="0.5;0" dur="2s" repeatCount="indefinite" begin="0.7s"/>
+        </circle>
+
+        <!-- SHIELD (center main node) -->
+        <g class="shield-group">
+          <!-- Outer glow -->
+          <circle cx="260" cy="170" r="42" fill="#EEF2FF" stroke="#C7D4FF" stroke-width="1.5"/>
+          <circle cx="260" cy="170" r="32" fill="url(#shieldGrad)"/>
+          <!-- Shield icon path -->
+          <path d="M260 148 C260 148 244 154 244 166 L244 175 C244 184.5 251 192 260 196 C269 192 276 184.5 276 175 L276 166 C276 154 260 148 260 148Z"
+                fill="white" opacity="0.95"/>
+          <path d="M256 173 L259 176 L265 169" stroke="#4776E6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </g>
+
+        <!-- Secondary nodes -->
+        <!-- Node: left -->
+        <circle cx="140" cy="270" r="28" fill="url(#nodeGrad1)" class="node-blink"/>
+        <text x="140" y="275" text-anchor="middle" fill="white" font-size="14" font-family="Arial">⚡</text>
+
+        <!-- Node: right -->
+        <circle cx="380" cy="270" r="28" fill="url(#nodeGrad2)" class="node-blink-2"/>
+        <text x="380" y="275" text-anchor="middle" fill="white" font-size="14" font-family="Arial">🔍</text>
+
+        <!-- Node: bottom -->
+        <circle cx="260" cy="330" r="24" fill="url(#nodeGrad3)" class="node-blink-3"/>
+        <text x="260" y="336" text-anchor="middle" fill="white" font-size="13" font-family="Arial">📊</text>
+
+        <!-- Leaf nodes -->
+        <circle cx="90" cy="360" r="16" fill="url(#leafGrad1)"/>
+        <text x="90" y="365" text-anchor="middle" fill="white" font-size="10" font-family="Arial">🌐</text>
+
+        <circle cx="430" cy="360" r="16" fill="url(#leafGrad2)"/>
+        <text x="430" y="365" text-anchor="middle" fill="white" font-size="10" font-family="Arial">🛡</text>
+
+        <!-- Mini data bars (top right of card) -->
+        <g transform="translate(370, 55)">
+          <rect x="0"  y="50" width="14" height="20" rx="3" fill="#4776E6" opacity="0.7"/>
+          <rect x="20" y="35" width="14" height="35" rx="3" fill="#8B5CF6" opacity="0.7"/>
+          <rect x="40" y="25" width="14" height="45" rx="3" fill="#22C7D9" opacity="0.7"/>
+          <rect x="60" y="40" width="14" height="30" rx="3" fill="#34D399" opacity="0.7"/>
+          <rect x="80" y="15" width="14" height="55" rx="3" fill="#F59E0B" opacity="0.7"/>
+          <!-- Animated bar height -->
+          <rect x="0"  y="50" width="14" height="20" rx="3" fill="#4776E6" opacity="0.4">
+            <animate attributeName="height" values="20;35;20" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="y" values="50;35;50" dur="3s" repeatCount="indefinite"/>
+          </rect>
+          <rect x="80" y="15" width="14" height="55" rx="3" fill="#F59E0B" opacity="0.4">
+            <animate attributeName="height" values="55;30;55" dur="2.5s" repeatCount="indefinite" begin="0.5s"/>
+            <animate attributeName="y" values="15;40;15" dur="2.5s" repeatCount="indefinite" begin="0.5s"/>
+          </rect>
+        </g>
+
+        <!-- Status badges -->
+        <g transform="translate(42, 55)">
+          <rect width="90" height="26" rx="13" fill="#DCFCE7"/>
+          <circle cx="16" cy="13" r="5" fill="#34D399">
+            <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="27" y="18" fill="#059669" font-size="10" font-family="Arial" font-weight="600">All Systems</text>
+        </g>
+
+        <g transform="translate(42, 90)">
+          <rect width="90" height="26" rx="13" fill="#FEF3C7"/>
+          <circle cx="16" cy="13" r="5" fill="#F59E0B">
+            <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+          </circle>
+          <text x="27" y="18" fill="#D97706" font-size="10" font-family="Arial" font-weight="600">1 Warning</text>
+        </g>
+
+        <!-- Label text -->
+        <text x="140" y="308" text-anchor="middle" fill="#64748B" font-size="10" font-family="Arial" font-weight="600">Intrusion</text>
+        <text x="380" y="308" text-anchor="middle" fill="#64748B" font-size="10" font-family="Arial" font-weight="600">Scanner</text>
+        <text x="260" y="366" text-anchor="middle" fill="#64748B" font-size="10" font-family="Arial" font-weight="600">Analytics</text>
+        <text x="90" y="385" text-anchor="middle" fill="#64748B" font-size="9" font-family="Arial">Network</text>
+        <text x="430" y="385" text-anchor="middle" fill="#64748B" font-size="9" font-family="Arial">Firewall</text>
+
+        <!-- Central label -->
+        <text x="260" y="222" text-anchor="middle" fill="#23345D" font-size="11" font-family="Arial" font-weight="700">Security Core</text>
+
+        <!-- Defs for gradients -->
+        <defs>
+          <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4776E6"/>
+            <stop offset="100%" stop-color="#8B5CF6"/>
+          </linearGradient>
+          <linearGradient id="nodeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#F87171"/>
+            <stop offset="100%" stop-color="#EF4444"/>
+          </linearGradient>
+          <linearGradient id="nodeGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#7C3AED"/>
+          </linearGradient>
+          <linearGradient id="nodeGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#22C7D9"/>
+            <stop offset="100%" stop-color="#0891B2"/>
+          </linearGradient>
+          <linearGradient id="leafGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4776E6"/>
+            <stop offset="100%" stop-color="#22C7D9"/>
+          </linearGradient>
+          <linearGradient id="leafGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#34D399"/>
+            <stop offset="100%" stop-color="#059669"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FEATURES SECTION
+================================================================ -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-tag"><i class="fa-solid fa-stars"></i> Features</div>
+      <h2 class="section-title">Everything You Need for<br><span class="gradient-text">Cyber Threat Analysis</span></h2>
+      <p class="section-sub">
+        A complete suite of analytical tools designed to help security professionals uncover threats, understand attack patterns, and defend their infrastructure.
+      </p>
+    </div>
+    <div class="features-grid">
+
+      <!-- 1. Smart Upload -->
+      <div class="feature-card" style="--card-accent: linear-gradient(90deg, #4776E6, #6B9AF2);">
+        <div class="feature-icon" style="background: linear-gradient(135deg, #4776E6, #6B9AF2);">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <h3 class="feature-title">Smart Upload</h3>
+        <p class="feature-desc">Drag-and-drop CSV file ingestion with automatic schema detection, column validation, and real-time parsing feedback.</p>
+      </div>
+
+      <!-- 2. Attack Analysis -->
+      <div class="feature-card" style="--card-accent: linear-gradient(90deg, #F87171, #EF4444);">
+        <div class="feature-icon" style="background: linear-gradient(135deg, #F87171, #EF4444);">
+          <i class="fa-solid fa-crosshairs"></i>
+        </div>
+        <h3 class="feature-title">Attack Analysis</h3>
+        <p class="feature-desc">Classify and visualize attack types including DoS, DDoS, PortScan, Brute Force, and Web Attacks with detailed breakdowns.</p>
+      </div>
+
+      <!-- 3. Anomaly Detection -->
+      <div class="feature-card" style="--card-accent: linear-gradient(90deg, #8B5CF6, #7C3AED);">
+        <div class="feature-icon" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <h3 class="feature-title">Anomaly Detection</h3>
+        <p class="feature-desc">AI-powered statistical models identify outliers and unusual traffic patterns using Z-score, IQR, and Isolation Forest methods.</p>
+      </div>
+
+      <!-- 4. Interactive Charts -->
+      <div class="feature-card" style="--card-accent: linear-gradient(90deg, #22C7D9, #0891B2);">
+        <div class="feature-icon" style="background: linear-gradient(135deg, #22C7D9, #0891B2);">
+          <i class="fa-solid fa-chart-bar"></i>
+        </div>
+        <h3 class="feature-title">Interactive Charts</h3>
+        <p class="feature-desc">50+ chart types including heatmaps, scatter plots, time series, and network graphs — all interactive and fully customizable.</p>
+      </div>
+
+      <!-- 5. Report Export -->
+      <div class="feature-card" style="--card-accent: linear-gradient(90deg, #34D399, #059669);">
+        <div class="feature-icon" style="background: linear-gradient(135deg, #34D399, #059669);">
+          <i class="fa-solid fa-file-pdf"></i>
+        </div>
+        <h3 class="feature-title">Report Export</h3>
+        <p class="feature-desc">Generate professional PDF, CSV, and JSON reports with one click. Include charts, statistics, and executive summaries automatically.</p>
+      </div>
+
+      <!-- 6. Real-time Filters -->
+      <div class="feature-card" style="--card-accent: linear-gradient(90deg, #F59E0B, #D97706);">
+        <div class="feature-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+          <i class="fa-solid fa-filter"></i>
+        </div>
+        <h3 class="feature-title">Real-time Filters</h3>
+        <p class="feature-desc">Instantly slice and dice your data with multi-dimensional filters by attack type, protocol, IP range, time window, and severity.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     HOW IT WORKS
+================================================================ -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-tag"><i class="fa-solid fa-arrows-rotate"></i> Workflow</div>
+      <h2 class="section-title">How CyberVision AI <span class="gradient-text">Works</span></h2>
+      <p class="section-sub">
+        From raw network data to actionable threat intelligence in four simple steps.
+      </p>
+    </div>
+    <div class="steps-wrapper">
+
+      <div class="step">
+        <div class="step-bubble">
+          <span class="step-num">01</span>
+        </div>
+        <h4 class="step-title">Upload CSV</h4>
+        <p class="step-desc">Import your CICIDS or custom network traffic dataset via drag-and-drop or file picker.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-bubble">
+          <span class="step-num">02</span>
+        </div>
+        <h4 class="step-title">Analyze Data</h4>
+        <p class="step-desc">Our engine profiles every flow, computes statistics, and classifies attack signatures automatically.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-bubble">
+          <span class="step-num">03</span>
+        </div>
+        <h4 class="step-title">Visualize</h4>
+        <p class="step-desc">Explore rich interactive dashboards, heatmaps, and anomaly charts tailored to your dataset.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-bubble">
+          <span class="step-num">04</span>
+        </div>
+        <h4 class="step-title">Export Report</h4>
+        <p class="step-desc">Download a comprehensive PDF or CSV report and share insights with your security team instantly.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     STATISTICS BANNER
+================================================================ -->
+<section class="stats-banner">
+  <div class="container">
+    <div class="banner-stat">
+      <span class="val">50,000+</span>
+      <span class="lbl">Records Supported</span>
+    </div>
+    <div class="banner-stat">
+      <span class="val">6</span>
+      <span class="lbl">Attack Categories</span>
+    </div>
+    <div class="banner-stat">
+      <span class="val">4</span>
+      <span class="lbl">Detection Methods</span>
+    </div>
+    <div class="banner-stat">
+      <span class="val">3</span>
+      <span class="lbl">Export Formats</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     DASHBOARD PREVIEW
+================================================================ -->
+<section class="preview" id="dashboard-preview">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-tag"><i class="fa-solid fa-display"></i> Preview</div>
+      <h2 class="section-title">Dashboard <span class="gradient-text">Preview</span></h2>
+      <p class="section-sub">
+        A live glimpse of the powerful analytics dashboard you get when you upload your dataset.
+      </p>
+    </div>
+
+    <div class="preview-wrapper">
+      <!-- Fake browser chrome -->
+      <div class="preview-header">
+        <div class="preview-dot" style="background:#F87171;"></div>
+        <div class="preview-dot" style="background:#F59E0B;"></div>
+        <div class="preview-dot" style="background:#34D399;"></div>
+        <div class="preview-title-bar"></div>
+        <span style="font-size:.75rem;color:#94A3B8;font-weight:500;">CyberVision AI — Dashboard</span>
+      </div>
+
+      <!-- Mini stat cards -->
+      <div class="preview-stat-cards">
+        <div class="pstat">
+          <span class="pstat-label"><i class="fa-solid fa-circle-exclamation" style="color:#F87171;"></i> Total Threats</span>
+          <span class="pstat-value">3,842</span>
+          <span class="pstat-trend down"><i class="fa-solid fa-arrow-trend-up"></i> +12.4% this week</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label"><i class="fa-solid fa-circle-check" style="color:#34D399;"></i> Normal Traffic</span>
+          <span class="pstat-value">21,558</span>
+          <span class="pstat-trend up"><i class="fa-solid fa-check"></i> Baseline normal</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label"><i class="fa-solid fa-triangle-exclamation" style="color:#F59E0B;"></i> Anomalies</span>
+          <span class="pstat-value">247</span>
+          <span class="pstat-trend down"><i class="fa-solid fa-arrow-trend-up"></i> +5.1% detected</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-label"><i class="fa-solid fa-gauge" style="color:#4776E6;"></i> Accuracy</span>
+          <span class="pstat-value">99.2%</span>
+          <span class="pstat-trend up"><i class="fa-solid fa-star"></i> Excellent</span>
+        </div>
+      </div>
+
+      <!-- Chart.js preview -->
+      <div class="chart-container-preview">
+        <canvas id="previewChart"></canvas>
+      </div>
+
+      <div class="preview-footer">
+        <a href="dashboard.html" class="btn btn-primary">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          Open Full Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     USE CASES
+================================================================ -->
+<section class="use-cases" id="use-cases">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-tag"><i class="fa-solid fa-users"></i> Use Cases</div>
+      <h2 class="section-title">Built For <span class="gradient-text">Security Professionals</span></h2>
+      <p class="section-sub">
+        Whether you're defending a network, researching threats, or learning cybersecurity, CyberVision AI has you covered.
+      </p>
+    </div>
+    <div class="usecase-grid">
+
+      <!-- Network Security Teams -->
+      <div class="usecase-card">
+        <div class="usecase-icon" style="background: rgba(71,118,230,.12);">
+          <span style="font-size:1.8rem;">🛡️</span>
+        </div>
+        <h3 class="usecase-title">Network Security Teams</h3>
+        <p class="usecase-desc">
+          Monitor live traffic patterns, detect intrusions in real time, and generate comprehensive incident reports for your SOC with automated alert triage.
+        </p>
+        <div class="usecase-tags">
+          <span class="tag">SOC Analysts</span>
+          <span class="tag">IDS/IPS</span>
+          <span class="tag">Incident Response</span>
+        </div>
+      </div>
+
+      <!-- Security Researchers -->
+      <div class="usecase-card">
+        <div class="usecase-icon" style="background: rgba(139,92,246,.12);">
+          <span style="font-size:1.8rem;">🔬</span>
+        </div>
+        <h3 class="usecase-title">Security Researchers</h3>
+        <p class="usecase-desc">
+          Explore CICIDS datasets deeply, visualize attack signatures, compare detection algorithms, and publish reproducible findings with built-in export tools.
+        </p>
+        <div class="usecase-tags">
+          <span class="tag" style="background:rgba(139,92,246,.10);color:#8B5CF6;">ML Research</span>
+          <span class="tag" style="background:rgba(139,92,246,.10);color:#8B5CF6;">Dataset Analysis</span>
+          <span class="tag" style="background:rgba(139,92,246,.10);color:#8B5CF6;">Publications</span>
+        </div>
+      </div>
+
+      <!-- CS Students -->
+      <div class="usecase-card">
+        <div class="usecase-icon" style="background: rgba(34,199,217,.12);">
+          <span style="font-size:1.8rem;">🎓</span>
+        </div>
+        <h3 class="usecase-title">Computer Science Students</h3>
+        <p class="usecase-desc">
+          Learn cybersecurity concepts hands-on with real datasets. Explore anomaly detection methods, understand attack vectors, and build your portfolio projects.
+        </p>
+        <div class="usecase-tags">
+          <span class="tag" style="background:rgba(34,199,217,.10);color:#0891B2;">Learning</span>
+          <span class="tag" style="background:rgba(34,199,217,.10);color:#0891B2;">Projects</span>
+          <span class="tag" style="background:rgba(34,199,217,.10);color:#0891B2;">Assignments</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- Brand -->
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo">
+          <div class="logo-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <span>CyberVision AI</span>
+        </a>
+        <p class="footer-tagline">
+          The smart cybersecurity analytics platform that turns raw network traffic data into actionable security intelligence.
+        </p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="#" class="social-btn" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" class="social-btn" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" class="social-btn" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+        </div>
+      </div>
+
+      <!-- Platform links -->
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="upload.html">Upload Dataset</a></li>
+          <li><a href="analysis.html">Attack Analysis</a></li>
+          <li><a href="anomaly.html">Anomaly Detection</a></li>
+          <li><a href="reports.html">Reports</a></li>
+        </ul>
+      </div>
+
+      <!-- Resources links -->
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Documentation</a></li>
+          <li><a href="#">Sample Datasets</a></li>
+          <li><a href="#">API Reference</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+
+      <!-- Connect links -->
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">GitHub Repository</a></li>
+          <li><a href="#">Report a Bug</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="footer-bottom">
+      <span>© 2025 CyberVision AI. Built for cybersecurity education and research.</span>
+      <div class="footer-bottom-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ================================================================
+     SCRIPTS
+================================================================ -->
+<script>
+  // ── Hamburger / Mobile Menu ──────────────────────────────────
+  (function () {
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    function toggleMenu() {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+    }
+
+    hamburger.addEventListener('click', toggleMenu);
+    hamburger.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMenu(); }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function (e) {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+      }
+    });
+  })();
+
+  // ── Navbar scroll shadow ─────────────────────────────────────
+  window.addEventListener('scroll', function () {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 10) {
+      navbar.style.boxShadow = '0 4px 24px rgba(35,52,93,.12)';
+    } else {
+      navbar.style.boxShadow = '0 2px 20px rgba(35,52,93,.07)';
+    }
+  });
+
+  // ── Chart.js Dashboard Preview Chart ─────────────────────────
+  (function () {
+    const ctx = document.getElementById('previewChart');
+    if (!ctx) return;
+
+    const labels  = ['DoS', 'DDoS', 'Normal', 'PortScan', 'Brute Force', 'Web Attack'];
+    const counts  = [1240, 980, 21558, 612, 345, 180];
+    const colors  = ['#F87171', '#F59E0B', '#34D399', '#8B5CF6', '#4776E6', '#22C7D9'];
+    const borders = colors.map(c => c);
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Traffic Records',
+          data: counts,
+          backgroundColor: colors.map(c => c + 'CC'),
+          borderColor: borders,
+          borderWidth: 2,
+          borderRadius: 8,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#23345D',
+            titleColor: '#fff',
+            bodyColor: 'rgba(255,255,255,.8)',
+            padding: 12,
+            cornerRadius: 10,
+            callbacks: {
+              label: function(ctx) {
+                return ' ' + ctx.parsed.y.toLocaleString() + ' records';
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: '#64748B',
+              font: { family: 'Inter', size: 12, weight: '500' }
+            }
+          },
+          y: {
+            grid: { color: '#F1F5F9', lineWidth: 1 },
+            ticks: {
+              color: '#94A3B8',
+              font: { family: 'Inter', size: 11 },
+              callback: function(val) {
+                return val >= 1000 ? (val / 1000).toFixed(0) + 'K' : val;
+              }
+            }
+          }
+        }
+      }
+    });
+  })();
+
+  // ── Scroll reveal (simple intersection observer) ─────────────
+  (function () {
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.style.animation = 'fadeInUp 0.6s ease both';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(
+      '.feature-card, .step, .usecase-card, .pstat, .banner-stat'
+    ).forEach(function (el) {
+      el.style.opacity = '0';
+      observer.observe(el);
+    });
+  })();
+</script>
+
+</body>
+</html>

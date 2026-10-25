@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Project - CyberVision AI</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .architecture-box {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .architecture-box:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(71, 118, 230, 0.15);
+    }
+    .arch-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--primary, #4776E6);
+    }
+    .tech-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.85rem;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #23345D;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>CyberVision AI</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="upload.html">Upload</a></li>
+        <li><a href="analysis.html">Analysis</a></li>
+        <li><a href="anomaly.html">Anomaly Detection</a></li>
+        <li><a href="reports.html">Reports</a></li>
+        <li><a href="about.html" class="active">About</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="upload.html" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Upload Dataset
+        </a>
+      </div>
+      <button class="mobile-toggle" aria-label="Toggle Navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header class="page-header" style="background: linear-gradient(135deg, #F4F8FF 0%, #E0E7FF 100%); padding: 3rem 1.5rem; text-align: center; border-bottom: 1px solid #E2E8F0;">
+    <div class="container" style="max-width: 900px; margin: 0 auto;">
+      <span class="badge" style="background: rgba(71, 118, 230, 0.1); color: #4776E6; margin-bottom: 1rem; padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600; display: inline-block;">
+        <i class="fa-solid fa-circle-info"></i> Project Documentation & Architecture
+      </span>
+      <h1 style="font-size: 2.5rem; color: #23345D; font-family: 'Poppins', sans-serif; margin-bottom: 0.75rem;">
+        About CyberVision AI
+      </h1>
+      <p style="color: #64748B; font-size: 1.1rem; line-height: 1.6;">
+        A specialized analytics and intelligence platform designed to decode complex network telemetry, surface security anomalies, and transform raw security logs into actionable visual insights.
+      </p>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1140px; margin: 2.5rem auto; padding: 0 1.5rem;">
+
+    <!-- Project Overview & Problem Statement -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.75rem; margin-bottom: 2.5rem;">
+      <div class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2rem; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+        <div style="width: 48px; height: 48px; background: rgba(71, 118, 230, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #4776E6; font-size: 1.25rem; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 style="color: #23345D; font-family: 'Poppins', sans-serif; margin-bottom: 0.75rem;">Problem Statement</h3>
+        <p style="color: #64748B; font-size: 0.95rem; line-height: 1.6;">
+          Modern enterprise environments generate millions of network telemetry records daily. Analyzing raw packet captures, firewall events, and intrusion logs manually is virtually impossible, error-prone, and causes alert fatigue for security analysts.
+        </p>
+      </div>
+
+      <div class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2rem; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+        <div style="width: 48px; height: 48px; background: rgba(52, 211, 153, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #34D399; font-size: 1.25rem; margin-bottom: 1.25rem;">
+          <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <h3 style="color: #23345D; font-family: 'Poppins', sans-serif; margin-bottom: 0.75rem;">Proposed Solution</h3>
+        <p style="color: #64748B; font-size: 0.95rem; line-height: 1.6;">
+          CyberVision AI bridges this gap with an intuitive, interactive web platform. It ingests CSV telemetry datasets, standardizes diverse schemas, runs heuristic and machine-learning anomaly detection, and presents dynamic visual dashboards and PDF audit reports.
+        </p>
+      </div>
+    </div>
+
+    <!-- Objectives -->
+    <section class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2.25rem; border: 1px solid #E2E8F0; margin-bottom: 2.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+      <h3 style="color: #23345D; font-family: 'Poppins', sans-serif; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-list-check" style="color: #8B5CF6;"></i> Key Project Objectives
+      </h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="fa-solid fa-circle-check" style="color: #34D399; margin-top: 0.25rem;"></i>
+          <span style="color: #475569; font-size: 0.95rem;"><b>Automated Ingestion:</b> Effortless drag-and-drop CSV upload with intelligent schema auto-mapping.</span>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="fa-solid fa-circle-check" style="color: #34D399; margin-top: 0.25rem;"></i>
+          <span style="color: #475569; font-size: 0.95rem;"><b>Behavioral Profiling:</b> Unveil attack category patterns, protocol shares, and high-frequency threat origins.</span>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="fa-solid fa-circle-check" style="color: #34D399; margin-top: 0.25rem;"></i>
+          <span style="color: #475569; font-size: 0.95rem;"><b>Machine Learning Anomaly Detection:</b> Apply Isolation Forest and Z-score outlier models without requiring manual rules.</span>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="fa-solid fa-circle-check" style="color: #34D399; margin-top: 0.25rem;"></i>
+          <span style="color: #475569; font-size: 0.95rem;"><b>Interactive Visualization:</b> Reactive Chart.js visualizations that update dynamically upon filtering.</span>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+          <i class="fa-solid fa-circle-check" style="color: #34D399; margin-top: 0.25rem;"></i>
+          <span style="color: #475569; font-size: 0.95rem;"><b>Audit & Export:</b> Download clean filtered CSVs, raw analytical JSON, or compiled executive PDF briefs.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Flowchart -->
+    <section class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2.25rem; border: 1px solid #E2E8F0; margin-bottom: 2.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+      <h3 style="color: #23345D; font-family: 'Poppins', sans-serif; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-network-wired" style="color: #22C7D9;"></i> System Architecture & Data Flow
+      </h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; align-items: center;">
+        <div class="architecture-box">
+          <i class="fa-solid fa-file-csv" style="font-size: 1.75rem; color: #34D399; margin-bottom: 0.5rem;"></i>
+          <h4 style="font-size: 0.9rem; color: #23345D; margin-bottom: 0.25rem;">1. CSV Telemetry</h4>
+          <p style="font-size: 0.75rem; color: #64748B;">Network flows & IDS logs</p>
+        </div>
+
+        <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+        <div class="architecture-box">
+          <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.75rem; color: #4776E6; margin-bottom: 0.5rem;"></i>
+          <h4 style="font-size: 0.9rem; color: #23345D; margin-bottom: 0.25rem;">2. FastAPI Backend</h4>
+          <p style="font-size: 0.75rem; color: #64748B;">Validation & Ingestion</p>
+        </div>
+
+        <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+        <div class="architecture-box">
+          <i class="fa-solid fa-broom" style="font-size: 1.75rem; color: #8B5CF6; margin-bottom: 0.5rem;"></i>
+          <h4 style="font-size: 0.9rem; color: #23345D; margin-bottom: 0.25rem;">3. Data Cleaner</h4>
+          <p style="font-size: 0.75rem; color: #64748B;">Schema map & imputation</p>
+        </div>
+
+        <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+        <div class="architecture-box">
+          <i class="fa-solid fa-brain" style="font-size: 1.75rem; color: #F59E0B; margin-bottom: 0.5rem;"></i>
+          <h4 style="font-size: 0.9rem; color: #23345D; margin-bottom: 0.25rem;">4. Analytics & ML</h4>
+          <p style="font-size: 0.75rem; color: #64748B;">Pandas & Isolation Forest</p>
+        </div>
+
+        <div class="arch-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+        <div class="architecture-box">
+          <i class="fa-solid fa-chart-line" style="font-size: 1.75rem; color: #22C7D9; margin-bottom: 0.5rem;"></i>
+          <h4 style="font-size: 0.9rem; color: #23345D; margin-bottom: 0.25rem;">5. Chart.js UI</h4>
+          <p style="font-size: 0.75rem; color: #64748B;">Reactive visual dashboard</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2.25rem; border: 1px solid #E2E8F0; margin-bottom: 2.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+      <h3 style="color: #23345D; font-family: 'Poppins', sans-serif; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-layer-group" style="color: #4776E6;"></i> Technology Stack
+      </h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+        <span class="tech-badge"><i class="fa-brands fa-html5" style="color: #E44D26;"></i> HTML5 (Semantic Structure)</span>
+        <span class="tech-badge"><i class="fa-brands fa-css3-alt" style="color: #264DE4;"></i> CSS3 (Custom Responsive Layouts)</span>
+        <span class="tech-badge"><i class="fa-brands fa-js" style="color: #F7DF1E;"></i> Vanilla JavaScript (ES6+)</span>
+        <span class="tech-badge"><i class="fa-solid fa-chart-pie" style="color: #FF6384;"></i> Chart.js (Data Visualizations)</span>
+        <span class="tech-badge"><i class="fa-brands fa-python" style="color: #3776AB;"></i> Python 3.10+ (Core Logic)</span>
+        <span class="tech-badge"><i class="fa-solid fa-bolt" style="color: #009688;"></i> FastAPI (Async RESTful API)</span>
+        <span class="tech-badge"><i class="fa-solid fa-table" style="color: #150458;"></i> Pandas & NumPy (Data Processing)</span>
+        <span class="tech-badge"><i class="fa-solid fa-microchip" style="color: #F7931E;"></i> Scikit-Learn (Isolation Forest ML)</span>
+        <span class="tech-badge"><i class="fa-solid fa-file-pdf" style="color: #EA4335;"></i> ReportLab (PDF Report Compiler)</span>
+      </div>
+    </section>
+
+    <!-- Dataset Sources & Academic Citations -->
+    <section class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2.25rem; border: 1px solid #E2E8F0; margin-bottom: 2.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+      <h3 style="color: #23345D; font-family: 'Poppins', sans-serif; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+        <i class="fa-solid fa-database" style="color: #34D399;"></i> Benchmark Datasets & Data Sources
+      </h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+        <div style="padding: 1.25rem; background: #F8FAFC; border-radius: 10px; border-left: 4px solid #4776E6;">
+          <h4 style="color: #23345D; margin-bottom: 0.5rem;">CIC-IDS2017 Dataset</h4>
+          <p style="color: #64748B; font-size: 0.875rem; line-height: 1.5;">
+            Developed by the Canadian Institute for Cybersecurity (UNB). Features real-world network traffic benign and modern attack scenarios (DoS Hulk, DDoS, PortScan, Brute Force).
+          </p>
+        </div>
+        <div style="padding: 1.25rem; background: #F8FAFC; border-radius: 10px; border-left: 4px solid #8B5CF6;">
+          <h4 style="color: #23345D; margin-bottom: 0.5rem;">UNSW-NB15 Dataset</h4>
+          <p style="color: #64748B; font-size: 0.875rem; line-height: 1.5;">
+            Created by the Australian Centre for Cyber Security. Contains synthetic modern normal and contemporary synthesized attack activities across 49 features.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Limitations & Future Scope -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.75rem; margin-bottom: 3rem;">
+      <div class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2rem; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+        <h4 style="color: #23345D; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-shield-virus" style="color: #F87171;"></i> Platform Scope & Limitations
+        </h4>
+        <ul style="color: #64748B; font-size: 0.875rem; line-height: 1.6; padding-left: 1.25rem;">
+          <li>Offline post-event dataset analysis only; does not provide real-time network interception or packet dropping.</li>
+          <li>Anomalies flagged are statistical and rule-based outliers; domain analyst verification remains necessary.</li>
+          <li>Initial release targets delimited tabular CSV files.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="background: #FFFFFF; border-radius: 14px; padding: 2rem; border: 1px solid #E2E8F0; box-shadow: 0 4px 6px rgba(0,0,0,0.03);">
+        <h4 style="color: #23345D; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-rocket" style="color: #34D399;"></i> Future Scope & Enhancements
+        </h4>
+        <ul style="color: #64748B; font-size: 0.875rem; line-height: 1.6; padding-left: 1.25rem;">
+          <li>Real-time packet sniffing and PCAP direct streaming via Scapy or Zeek/Bro hooks.</li>
+          <li>Automated firewall rule generation and IP blocking via iptables / pfSense integrations.</li>
+          <li>Supervised deep learning models (Bi-LSTM, Autoencoders) for zero-day threat detection.</li>
+        </ul>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" style="background: #23345D; color: #94A3B8; padding: 3rem 1.5rem; border-top: 1px solid #334155;">
+    <div class="container" style="max-width: 1140px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;">
+      <div>
+        <div style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <i class="fa-solid fa-shield-halved" style="color: #22C7D9;"></i> CyberVision AI
+        </div>
+        <p style="font-size: 0.875rem; margin: 0;">Interactive Cybersecurity Analytics & Machine Learning Threat Intelligence Platform.</p>
+      </div>
+      <div style="font-size: 0.875rem;">
+        &copy; 2026 CyberVision AI. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
