@@ -1,41 +1,32 @@
-# Python
+# Python bytecode and cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-env/
+.pytest_cache/
+
+# Virtual Environments
+.venv/
 venv/
 ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+env/
+env.bak/
+venv.bak/
 
-# Uploads & Temp Data
+# Uploads & temporary runtime files
 backend/uploads/*
 !backend/uploads/.gitkeep
-backend/reports/generated/*
-!backend/reports/generated/.gitkeep
+temp/
+*.log
 
-# IDEs
+# IDE & Editor Settings
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# OS
-Thumbs.db
-Desktop.ini
+*.sublime-project
+*.sublime-workspace
 .DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
